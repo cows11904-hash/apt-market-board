@@ -1,0 +1,17 @@
+{
+  "name": "apt-market-board",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fetch:transactions": "node scripts/fetch-transactions.mjs",
+    "test": "node --test scripts/*.test.mjs",
+    "build": "node scripts/prepare-pages.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "fast-xml-parser": "5.12.0"
+  }
+}

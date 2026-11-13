@@ -1,0 +1,85 @@
+name: Publish 시세나침반
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # 매일 06:17 KST. Actions 실행은 예약 시각보다 늦어질 수 있습니다.
+    - cron: '17 21 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sisena-pages
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: Test and collect official trades
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      pages: read
+    outputs:
+      refresh_outcome: ${{ steps.refresh.outcome }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - name: Refresh from the official API
+        id: refresh
+        continue-on-error: true
+        env:
+          MOLIT_SERVICE_KEY: ${{ secrets.MOLIT_SERVICE_KEY }}
+        run: npm run fetch:transactions
+      - name: Validate Pages files
+        run: npm run build
+      - name: Record snapshot and refresh status
+        run: |
+          git add -- data
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'data: update official trade snapshot and refresh status'
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy static site
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+  refresh-alert:
+    name: Report failed refresh
+    needs: [collect, deploy]
+    if: needs.collect.outputs.refresh_outcome == 'failure'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo '::error::Official API refresh failed. Pages displays the last successful data, if available.'
+          exit 1
