@@ -43,6 +43,15 @@ test('조회 CSV는 동일 계약을 보존하고 가격 원 단위와 출처, �
   assert.equal(seoulDay(row.checkedAt), '2026-01-13');
 });
 
+test('법정동 접미사를 생략해도 같은 단지가 검색된다', () => {
+  const target = { ...common, aptName: '가상동아파트', dong: '가상동', areaM2: 84.25 };
+  const differentNeighborhood = { ...target, dong: '검증동' };
+  const records = [target, differentNeighborhood];
+  const filters = { area: 'all', search: '가상 아파트' };
+  assert.deepEqual(filterRecords(records, filters), [target]);
+  assert.deepEqual(filterRecords(records, { ...filters, search: '가상동아파트' }), records);
+});
+
 test('게시 승인·매물 ID·원본·확인일을 요구하고 유효 기간 밖 호가를 숨긴다', () => {
   const data = { providers: [provider], listings: [listing] };
   assert.equal(activeListings(validateListings(data), '11110', new Date('2026-01-13T00:00:00Z')).length, 1);

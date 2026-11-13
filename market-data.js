@@ -65,11 +65,22 @@ function searchKey(value) {
   return value.normalize('NFC').replace(/\s+/g, '').toLocaleLowerCase('ko');
 }
 
+function matchesApartment(row, query) {
+  const name = searchKey(row.aptName);
+  if (name.includes(query)) return true;
+
+  // Support names commonly written without the legal neighborhood's 동/읍/면 suffix.
+  const neighborhood = searchKey(row.dong ?? '');
+  if (!/[동읍면]$/.test(neighborhood) || neighborhood.length < 2 || !name.startsWith(neighborhood)) return false;
+  const shortened = neighborhood.slice(0, -1);
+  return query.startsWith(shortened) && `${shortened}${name.slice(neighborhood.length)}`.startsWith(query);
+}
+
 export function filterRecords(records, filters) {
   const [min, max] = areaRanges[filters.area] ?? [0, Infinity];
   const query = searchKey(filters.search);
   return records.filter(row => row.areaM2 >= min && row.areaM2 <= max
-    && (!query || searchKey(row.aptName).includes(query))
+    && (!query || matchesApartment(row, query))
     && (!filters.maxWon || (row.priceWon ?? row.askWon) <= filters.maxWon)
     && (!filters.month || row.dealDate?.startsWith(filters.month))
     && (!filters.kind || row.transactionType === filters.kind));
