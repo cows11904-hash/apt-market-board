@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "state": "ok",
-  "lastAttemptAt": "2026-11-13T05:07:25.338Z",
-  "updatedAt": "2026-11-13T05:07:25.338Z",
-  "revision": "20261113T050725338Z",
+  "lastAttemptAt": "2026-11-13T05:12:29.676Z",
+  "updatedAt": "2026-11-13T05:12:29.676Z",
+  "revision": "20261113T051229676Z",
   "source": "국토교통부 아파트 매매 실거래가 상세 자료",
   "sourceUrl": "https://www.data.go.kr/data/15126468/openapi.do",
   "months": [
