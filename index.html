@@ -25,9 +25,9 @@
         <div>
           <p class="hero-region" id="hero-region">서울특별시 · 25개 자치구</p>
           <h1 id="page-title">아파트 매매 실거래가</h1>
-          <p class="hero-copy">단지와 전용면적으로 찾는 국토교통부 신고 가격</p>
+          <p class="hero-copy" id="hero-copy">단지와 전용면적으로 찾는 국토교통부 신고 가격</p>
         </div>
-        <div class="data-card">
+        <div class="data-card" id="trade-status">
           <div class="data-status" id="data-status" role="status"><span aria-hidden="true"></span><strong>데이터 확인 중</strong></div>
           <p id="data-timestamp">마지막 성공 수집일 확인 중</p>
           <a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">국토교통부 데이터 출처 <span aria-hidden="true">↗</span></a>
@@ -66,6 +66,10 @@
             </div>
             <div class="result-actions">
               <a class="button button-outline" id="source-link" href="https://rt.molit.go.kr/pt/xls/xls.do" target="_blank" rel="noopener noreferrer">공식 원자료 <span aria-hidden="true">↗</span></a>
+              <div class="result-actions" id="listing-links" hidden>
+                <a class="button button-outline" href="https://land.naver.com/" target="_blank" rel="noopener noreferrer">네이버 부동산에서 보기 <span aria-hidden="true">↗</span></a>
+                <a class="button button-outline" id="richgo-link" href="https://m.richgo.ai/realty/apt-hub/서울" target="_blank" rel="noopener noreferrer"><span id="richgo-label">리치고에서 보기</span><span aria-hidden="true">↗</span></a>
+              </div>
               <button type="button" class="button" id="csv" hidden>CSV 다운로드</button>
             </div>
           </div>
@@ -96,7 +100,7 @@
           <p><strong>수집 범위</strong> 현재 월과 직전 3개월의 아파트 매매 신고를 계약일 기준으로 조회합니다. 해제 신고 건을 제외하고 직거래는 거래 유형으로 표시합니다. 증여·상속·무상 이전은 매매 신고 범위에서 제외됩니다.</p>
           <p><strong>신고 시차</strong> 매매는 계약일부터 30일 이내에 신고합니다. 늦게 들어온 신고와 정정·해제가 반영되면 과거 계약월의 건수도 달라질 수 있습니다.</p>
           <p><strong>가격 비교</strong> 중위가격은 선택한 검색 조건에 해당하는 신고의 가운데 값입니다. 전용면적과 층, 거래 유형을 함께 확인하세요. 공개 자료로는 거래 당사자의 관계를 확인할 수 없습니다.</p>
-          <p><strong>호가 확인</strong> 게시 권한을 확보한 출처의 유효 매물에 한해 개별 확인일과 함께 표시합니다.</p>
+          <p><strong>호가 확인</strong> 게시 권한을 확보한 출처의 유효 매물을 마지막 확인일과 함께 표시합니다. 같은 세대가 여러 매물로 등록될 수 있고, 가격 변경이나 철회는 다음 수집 때 반영됩니다.</p>
           <a href="https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt=&amp;qnaProcessSttusCode=1" target="_blank" rel="noopener noreferrer">국토교통부 실거래가 FAQ ↗</a>
         </div>
       </details>

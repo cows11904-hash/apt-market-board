@@ -91,6 +91,11 @@ export function districtDataPath(manifest, code) {
   return `data/trades/${manifest.revision}/${code}.json`;
 }
 
+export function listingDataPath(code, hash) {
+  if (!districtKey.test(code) || typeof hash !== 'string' || !/^[a-f0-9]{12}$/.test(hash)) throw new Error('호가 자료 경로가 올바르지 않습니다.');
+  return `data/listings/${code}.${hash}.json`;
+}
+
 export function validateRegions(regions) {
   if (!Array.isArray(regions) || !regions.length) throw new Error('시·도 목록이 비어 있습니다.');
   const cityCodes = new Set();
@@ -162,6 +167,7 @@ export function validateDistrict(data, manifest, code) {
 }
 
 function isPublicUrl(value) {
+  if (typeof value !== 'string') return false;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' && !url.username && !url.password;

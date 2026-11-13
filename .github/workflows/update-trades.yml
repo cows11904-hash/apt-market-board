@@ -44,6 +44,9 @@ jobs:
           MOLIT_SERVICE_KEY: ${{ secrets.MOLIT_SERVICE_KEY }}
         run: npm run fetch:transactions
       - name: Validate Pages files
+        env:
+          LISTINGS_FEED_URL: ${{ secrets.LISTINGS_FEED_URL }}
+          LISTINGS_FEED_TOKEN: ${{ secrets.LISTINGS_FEED_TOKEN }}
         run: npm run build
       - name: Record snapshot and refresh status
         run: |

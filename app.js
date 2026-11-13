@@ -1,5 +1,5 @@
 import {
-  activeListings, districtDataPath, filterRecords, middlePrice, MOLIT_RECORDS_URL, MOLIT_SOURCE_URL,
+  activeListings, districtDataPath, filterRecords, listingDataPath, middlePrice, MOLIT_RECORDS_URL, MOLIT_SOURCE_URL,
   moneyWon, parsePriceLimit, seoulDateTime, seoulDay, STALE_AFTER_MS, tradesCsv,
   validateDistrict, validateListings, validateManifest, validateRegions,
 } from './market-data.js';
@@ -9,13 +9,13 @@ const controls = Object.fromEntries(['city', 'district', 'area', 'search', 'budg
 const tabs = [$('tab-trades'), $('tab-listings')];
 const pageSize = 30;
 const numbers = new Intl.NumberFormat('ko-KR');
-const state = { tab: 'trades', page: 1, regions: [], manifest: null, trades: null, listings: null, error: false };
+const state = { tab: 'trades', page: 1, regions: [], manifest: null, trades: null, listings: null, listingFeedState: null, error: false };
 let request;
 let visibleTrades = [];
 
 async function getJson(path, signal) {
   const response = await fetch(`./${path}`, {
-    cache: path.startsWith('data/trades/') ? 'default' : 'no-cache',
+    cache: /^data\/(trades|listings)\//.test(path) ? 'default' : 'no-cache',
     signal: AbortSignal.any([signal, AbortSignal.timeout(15_000)]),
   });
   if (!response.ok) throw new Error('자료를 불러오지 못했습니다.');
@@ -166,6 +166,12 @@ function render() {
   $('month-label').hidden = !isTrade;
   $('kind-label').hidden = !isTrade;
   $('source-link').hidden = !isTrade;
+  $('listing-links').hidden = isTrade;
+  if (!isTrade) {
+    const richgoPath = controls.city.value === '11' ? ['서울', districtName].filter(Boolean).map(encodeURIComponent).join('/') : '';
+    $('richgo-link').href = richgoPath ? `https://m.richgo.ai/realty/apt-hub/${richgoPath}` : 'https://m.richgo.ai/';
+    $('richgo-label').textContent = richgoPath && districtName ? `리치고 ${districtName} 호가 보기` : '리치고에서 보기';
+  }
   $('source-link').href = MOLIT_RECORDS_URL;
   $('results-title').textContent = isTrade ? '실거래 내역' : '매물 호가';
   $('results-subtitle').textContent = districtName || '지역별 아파트 조회';
@@ -195,8 +201,12 @@ function render() {
     }
     return;
   }
-  if (!isTrade && data.length === 0) {
-    setEmpty('현재 게시할 매물 호가가 없습니다', '공개 이용 권한과 개별 확인일이 확인된 유효 매물만 게시합니다.');
+  if (!isTrade && state.listingFeedState === 'failed') {
+    setEmpty('최근 매물 수집에 실패했습니다', '위의 사이트에서 매물이나 단지별 호가를 확인할 수 있습니다.');
+    return;
+  }
+  if (!isTrade && state.listingFeedState === 'unconfigured' && !data.length) {
+    setEmpty('매물 데이터 제공처 연동 전입니다', '위의 사이트에서 매물이나 단지별 호가를 확인할 수 있습니다.');
     return;
   }
   if (!district) {
@@ -220,7 +230,8 @@ function render() {
     setEmpty('가격 상한을 확인해 주세요', '가격 제한 없이 조회하려면 가격 상한을 비워 주세요.');
     return;
   }
-  const records = filterRecords(isTrade ? data : activeListings(data, district), {
+  const available = isTrade ? data : activeListings(data, district);
+  const records = filterRecords(available, {
     area: controls.area.value, search: controls.search.value, maxWon,
     month: isTrade ? controls.month.value.replace(/^(\d{4})(\d{2})$/, '$1-$2') : '', kind: isTrade ? controls.kind.value : '',
   });
@@ -230,7 +241,7 @@ function render() {
     const months = manifest.months;
     subtitle.push(controls.month.value ? monthLabel(controls.month.value) : `${monthLabel(months[0])} ~ ${monthLabel(months.at(-1))}`);
   }
-  subtitle.push(`${count}건`);
+  subtitle.push(isTrade ? `${count}건` : `게시 매물 ${count}건`);
   $('results-subtitle').textContent = subtitle.join(' · ');
   if (isTrade) {
     visibleTrades = records;
@@ -242,7 +253,11 @@ function render() {
     $('last-contract').textContent = records[0]?.dealDate ?? '—';
   }
   if (!records.length) {
-    setEmpty(isTrade ? '검색 조건에 맞는 신고 거래가 없습니다' : '검색 조건에 맞는 유효 매물이 없습니다', '전용면적이나 다른 검색 조건을 조정해 보세요.');
+    if (!isTrade && !available.length) {
+      setEmpty('이 지역에 게시 중인 매물이 없습니다', '다른 지역을 선택하거나 원본 사이트에서 확인해 보세요.');
+    } else {
+      setEmpty(isTrade ? '검색 조건에 맞는 신고 거래가 없습니다' : '검색 조건에 맞는 유효 매물이 없습니다', '전용면적이나 다른 검색 조건을 조정해 보세요.');
+    }
     return;
   }
   $('csv').hidden = !isTrade;
@@ -260,6 +275,11 @@ function render() {
 function setTab(tab) {
   state.tab = tab;
   state.page = 1;
+  const isTrade = tab === 'trades';
+  $('page-title').textContent = isTrade ? '아파트 매매 실거래가' : '아파트 매물 호가';
+  $('hero-copy').textContent = isTrade ? '단지와 전용면적으로 찾는 국토교통부 신고 가격' : '매물별 매도 희망 가격과 출처, 마지막 확인일';
+  $('trade-status').hidden = !isTrade;
+  document.title = `시세나침반 | ${$('page-title').textContent}`;
   for (const button of tabs) {
     const selected = button.id === `tab-${tab}`;
     button.setAttribute('aria-selected', String(selected));
@@ -293,7 +313,12 @@ async function load({ bootstrap = false } = {}) {
     if (state.tab === 'listings') {
       const data = await getJson('data/listings.json', signal);
       if (signal.aborted) return;
-      state.listings = validateListings(data);
+      const code = controls.district.value;
+      const hash = data.districts?.[code];
+      const snapshot = hash === undefined ? data : await getJson(listingDataPath(code, hash), signal);
+      if (signal.aborted) return;
+      state.listings = validateListings(snapshot);
+      state.listingFeedState = data.feedState ?? (state.listings.length ? 'ok' : 'unconfigured');
     } else {
       const manifest = validateManifest(await getJson('data/transactions.json', signal));
       if (signal.aborted) return;
@@ -321,14 +346,12 @@ controls.city.addEventListener('change', () => {
   setDistricts('');
   state.page = 1;
   updateUrl();
-  if (state.tab === 'trades') load();
-  else render();
+  load();
 });
 controls.district.addEventListener('change', () => {
   state.page = 1;
   updateUrl();
-  if (state.tab === 'trades') load();
-  else render();
+  load();
 });
 for (const key of ['area', 'search', 'budget', 'month', 'kind']) {
   controls[key].addEventListener(['search', 'budget'].includes(key) ? 'input' : 'change', () => {
@@ -382,12 +405,4 @@ $('csv').addEventListener('click', () => {
 
 const initialTab = new URLSearchParams(location.search).get('view') === 'listings' ? 'listings' : 'trades';
 setTab(initialTab);
-if (initialTab === 'listings') {
-  const signal = new AbortController().signal;
-  getJson('data/transactions.json', signal).then(data => {
-    if (state.tab !== 'listings') return;
-    state.manifest = validateManifest(data);
-    setStatus();
-  }).catch(() => {});
-}
 load({ bootstrap: true });

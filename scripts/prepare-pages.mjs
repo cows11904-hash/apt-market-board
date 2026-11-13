@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { activeListings, districtDataPath, validateDistrict, validateListings, validateManifest, validateRegions } from '../market-data.js';
+import { districtDataPath, listingDataPath, validateDistrict, validateManifest, validateRegions } from '../market-data.js';
+import { prepareListings } from './listings-feed.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = join(root, 'dist');
@@ -10,8 +11,6 @@ const json = async relative => JSON.parse(await readFile(join(root, relative), '
 const regions = validateRegions(await json('data/regions.json'));
 const regionCodes = new Set(regions.map(region => region.code));
 const manifest = validateManifest(await json('data/transactions.json'));
-const listingsFile = await json('data/listings.json');
-const listings = validateListings(listingsFile);
 const files = ['.nojekyll', 'data/regions.json', 'data/transactions.json'];
 let total = 0;
 if (manifest.revision) {
@@ -23,15 +22,22 @@ if (manifest.revision) {
   }
   if (!total) throw new Error('수집 기록에 연결된 정상 매매가 없습니다.');
 }
-if (listings.some(listing => !regionCodes.has(listing.districtCode))) throw new Error('공개 지역 목록에 없는 매물 호가가 있습니다.');
+const listingData = await prepareListings({
+  local: await json('data/listings.json'), regionCodes,
+  url: process.env.LISTINGS_FEED_URL, token: process.env.LISTINGS_FEED_TOKEN,
+});
+if (listingData.feedState === 'failed') {
+  console.warn('::warning::호가 피드 조회 또는 게시 검증에 실패했습니다. 피드의 호가는 게시하지 않습니다.');
+}
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 
+const contentHash = content => createHash('sha256').update(content).digest('hex').slice(0, 12);
+
 async function writeAsset(name, content) {
   const extension = extname(name);
-  const hash = createHash('sha256').update(content).digest('hex').slice(0, 12);
-  const publishedName = `${name.slice(0, -extension.length)}.${hash}${extension}`;
+  const publishedName = `${name.slice(0, -extension.length)}.${contentHash(content)}${extension}`;
   await writeFile(join(output, publishedName), content);
   return publishedName;
 }
@@ -47,16 +53,19 @@ await writeFile(join(output, 'index.html'), index);
 
 for (const path of files) {
   const target = join(output, path);
-  await mkdir(join(target, '..'), { recursive: true });
+  await mkdir(dirname(target), { recursive: true });
   await cp(join(root, path), target);
 }
-const now = new Date();
-const activeIds = new Set(regions.flatMap(region => activeListings(listings, region.code, now))
-  .map(row => JSON.stringify([row.providerId, row.listingId])));
-const publishedListings = listingsFile.listings.filter(row => activeIds.has(JSON.stringify([row.providerId, row.listingId])));
-const activeProviders = new Set(publishedListings.map(row => row.providerId));
+const districtVersions = {};
+for (const [code, snapshot] of listingData.districts) {
+  const content = JSON.stringify(snapshot) + '\n';
+  const hash = contentHash(content);
+  const target = join(output, listingDataPath(code, hash));
+  await mkdir(dirname(target), { recursive: true });
+  await writeFile(target, content);
+  districtVersions[code] = hash;
+}
 await writeFile(join(output, 'data/listings.json'), JSON.stringify({
-  providers: listingsFile.providers.filter(provider => activeProviders.has(provider.id)),
-  listings: publishedListings,
+  feedState: listingData.feedState, districts: districtVersions, providers: [], listings: [],
 }) + '\n');
 console.log(`Pages 배포 파일 검증 완료: ${regions.length}개 시·군·구, 정상 매매 ${total}건`);

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { activeListings, filterRecords, middlePrice, moneyWon, parsePriceLimit, seoulDay, tradesCsv, validateListings, validateRegions } from '../market-data.js';
+import { activeListings, filterRecords, listingDataPath, middlePrice, moneyWon, parsePriceLimit, seoulDay, tradesCsv, validateListings, validateRegions } from '../market-data.js';
+import { prepareListings } from './listings-feed.mjs';
 
 const common = { aptName: '가상 단지', dealDate: '2026-01-09', priceWon: 1_000_010_000, transactionType: '직거래',
   dong: '검증동', building: '', floor: 3, checkedAt: '2026-01-12T15:00:00.000Z' };
@@ -61,4 +62,68 @@ test('게시 승인·매물 ID·원본·확인일을 요구하고 유효 기간 
     assert.throws(() => validateListings({ ...data, listings: [row] }), /유효 기간/);
   }
   assert.equal(activeListings(validateListings({ ...data, listings: [{ ...listing, status: 'withdrawn' }] }), '11110', new Date('2026-01-13T00:00:00Z')).length, 0);
+});
+
+const feed = {
+  url: 'https://example.org/private-feed', token: 'test-only-token',
+  local: { providers: [provider], listings: [] },
+  regionCodes: new Set(['11110', '11380']), now: new Date('2026-01-13T12:00:00Z'),
+};
+const feedRow = { ...listing, transactionType: 'sale', propertyType: 'apartment' };
+
+test('수집한 호가에서 승인된 유효 매물의 공개 필드만 구별로 만든다', async () => {
+  const raw = [
+    { ...feedRow, privateNote: '사적 정보', floor: '저층' },
+    { ...feedRow, listingId: 'second-district', districtCode: '11380' },
+    { ...feedRow, listingId: 'expired', expiresAt: '2026-01-13T00:00:00.000Z' },
+    { ...feedRow, listingId: 'future', verifiedAt: '2026-01-13T13:00:00.000Z' },
+    { ...feedRow, listingId: 'withdrawn', status: 'withdrawn' },
+    { ...feedRow, listingId: 'outside', districtCode: '28110' },
+  ];
+  const output = await prepareListings({
+    ...feed, local: { ...feed.local, providers: [{ ...provider, privateContract: '계약 메모' }] },
+    fetcher: async (url, options) => {
+      assert.equal(url.href, feed.url);
+      assert.equal(options.headers.Authorization, `Bearer ${feed.token}`);
+      assert.equal(options.redirect, 'error');
+      return Response.json({ providers: [{ id: provider.id, name: '피드가 주장한 출처' }], listings: raw });
+    },
+  });
+  assert.equal(output.feedState, 'ok');
+  assert.deepEqual(output.districts, new Map([
+    ['11110', { providers: [provider], listings: [{ ...listing, floor: '저층' }] }],
+    ['11380', { providers: [provider], listings: [{ ...listing, listingId: 'second-district', districtCode: '11380' }] }],
+  ]));
+  assert.equal(listingDataPath('11110', '16a9c1a0b436'), 'data/listings/11110.16a9c1a0b436.json');
+  assert.throws(() => listingDataPath('11110', '../secret.json'), /경로/);
+});
+
+test('승인이 없거나 만료된 피드는 호출하지 않는다', async () => {
+  let requests = 0;
+  const fetcher = async () => { requests++; return Response.json({ listings: [] }); };
+  const result = await prepareListings({ ...feed, local: { providers: [], listings: [] }, fetcher });
+  const expired = await prepareListings({ ...feed, now: new Date('2026-01-31T15:00:00Z'), fetcher });
+  assert.equal(requests, 0);
+  assert.equal(result.feedState, 'failed');
+  assert.equal(expired.feedState, 'failed');
+});
+
+test('피드 전체 응답에서 빠진 호가는 제거하고 실패했을 때도 이전 호가를 게시하지 않는다', async () => {
+  const options = { ...feed, local: { ...feed.local, listings: [listing] } };
+  const empty = await prepareListings({ ...options, fetcher: async () => Response.json({ listings: [] }) });
+  assert.deepEqual(empty, { feedState: 'ok', districts: new Map() });
+  for (const bad of [
+    () => new Response('', { status: 503 }),
+    () => new Response('<html></html>'),
+    () => Response.json({ listings: [{ ...feedRow, providerId: 'unapproved' }] }),
+    () => Response.json({ listings: [{ ...feedRow, transactionType: 'rent' }] }),
+    () => Response.json({ listings: [{ ...feedRow, verifiedAt: null }] }),
+    () => Response.json({ listings: [feedRow, feedRow] }),
+  ]) {
+    const failed = await prepareListings({ ...options, fetcher: async () => bad() });
+    assert.deepEqual(failed, { feedState: 'failed', districts: new Map() });
+  }
+  const unconfigured = await prepareListings({ ...options, url: '' });
+  assert.equal(unconfigured.feedState, 'unconfigured');
+  assert.equal(unconfigured.districts.get('11110').listings[0].listingId, listing.listingId);
 });
