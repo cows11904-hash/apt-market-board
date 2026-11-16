@@ -3,6 +3,7 @@ export const MOLIT_SOURCE_URL = 'https://www.data.go.kr/data/15126468/openapi.do
 export const MOLIT_RECORDS_URL = 'https://rt.molit.go.kr/pt/xls/xls.do';
 export const STALE_AFTER_MS = 36 * 60 * 60 * 1000;
 export const TRADE_TYPES = ['중개거래', '직거래', '구분 미확인'];
+export const LISTINGS_ENABLED = false;
 
 const dayFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' });
 const timeFormat = new Intl.DateTimeFormat('sv-SE', {

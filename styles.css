@@ -45,6 +45,7 @@ h1 { font-size: clamp(30px, 4.5vw, 48px); letter-spacing: -.065em; line-height: 
 .data-card a { color: #d3ece3; font-size: 12px; }
 .workspace { padding-bottom: 38px; }
 .tabs { display: flex; gap: 24px; border-bottom: 1px solid #cfdcd6; margin: 14px 0 18px; }
+.tabs[hidden] + #results-panel { margin-top: 18px; }
 .tab { color: var(--muted); background: transparent; border: 0; border-bottom: 3px solid transparent; padding: 11px 3px 10px; font-size: 16px; font-weight: 750; }
 .tab[aria-selected='true'] { color: var(--teal); border-bottom-color: var(--teal); }
 .filters { padding: 16px 21px 20px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; }

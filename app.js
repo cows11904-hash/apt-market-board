@@ -1,12 +1,12 @@
 import {
-  activeListings, districtDataPath, filterRecords, listingDataPath, middlePrice, MOLIT_RECORDS_URL, MOLIT_SOURCE_URL,
+  activeListings, districtDataPath, filterRecords, listingDataPath, LISTINGS_ENABLED, middlePrice, MOLIT_RECORDS_URL, MOLIT_SOURCE_URL,
   moneyWon, parsePriceLimit, seoulDateTime, seoulDay, STALE_AFTER_MS, tradesCsv,
   validateDistrict, validateListings, validateManifest, validateRegions,
 } from './market-data.js';
 
 const $ = id => document.getElementById(id);
 const controls = Object.fromEntries(['city', 'district', 'area', 'search', 'budget', 'month', 'kind'].map(id => [id, $(id)]));
-const tabs = [$('tab-trades'), $('tab-listings')];
+const tabs = LISTINGS_ENABLED ? [$('tab-trades'), $('tab-listings')] : [];
 const pageSize = 30;
 const numbers = new Intl.NumberFormat('ko-KR');
 const state = { tab: 'trades', page: 1, regions: [], manifest: null, trades: null, listings: null, listingFeedState: null, error: false };
@@ -403,6 +403,16 @@ $('csv').addEventListener('click', () => {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 });
 
-const initialTab = new URLSearchParams(location.search).get('view') === 'listings' ? 'listings' : 'trades';
-setTab(initialTab);
+const pageUrl = new URL(location.href);
+const requestedListings = pageUrl.searchParams.get('view') === 'listings';
+if (LISTINGS_ENABLED) {
+  $('price-tabs').hidden = false;
+  $('listing-guide').hidden = false;
+  $('results-panel').setAttribute('role', 'tabpanel');
+  $('results-panel').tabIndex = 0;
+  setTab(requestedListings ? 'listings' : 'trades');
+} else if (requestedListings) {
+  pageUrl.searchParams.delete('view');
+  history.replaceState(null, '', pageUrl);
+}
 load({ bootstrap: true });

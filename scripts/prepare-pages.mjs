@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { districtDataPath, listingDataPath, validateDistrict, validateManifest, validateRegions } from '../market-data.js';
+import { districtDataPath, listingDataPath, LISTINGS_ENABLED, validateDistrict, validateManifest, validateRegions } from '../market-data.js';
 import { prepareListings } from './listings-feed.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -22,11 +22,13 @@ if (manifest.revision) {
   }
   if (!total) throw new Error('수집 기록에 연결된 정상 매매가 없습니다.');
 }
-const listingData = await prepareListings({
-  local: await json('data/listings.json'), regionCodes,
-  url: process.env.LISTINGS_FEED_URL, token: process.env.LISTINGS_FEED_TOKEN,
-});
-if (listingData.feedState === 'failed') {
+const listingData = LISTINGS_ENABLED
+  ? await prepareListings({
+    local: await json('data/listings.json'), regionCodes,
+    url: process.env.LISTINGS_FEED_URL, token: process.env.LISTINGS_FEED_TOKEN,
+  })
+  : null;
+if (listingData?.feedState === 'failed') {
   console.warn('::warning::호가 피드 조회 또는 게시 검증에 실패했습니다. 피드의 호가는 게시하지 않습니다.');
 }
 
@@ -56,16 +58,18 @@ for (const path of files) {
   await mkdir(dirname(target), { recursive: true });
   await cp(join(root, path), target);
 }
-const districtVersions = {};
-for (const [code, snapshot] of listingData.districts) {
-  const content = JSON.stringify(snapshot) + '\n';
-  const hash = contentHash(content);
-  const target = join(output, listingDataPath(code, hash));
-  await mkdir(dirname(target), { recursive: true });
-  await writeFile(target, content);
-  districtVersions[code] = hash;
+if (listingData) {
+  const districtVersions = {};
+  for (const [code, snapshot] of listingData.districts) {
+    const content = JSON.stringify(snapshot) + '\n';
+    const hash = contentHash(content);
+    const target = join(output, listingDataPath(code, hash));
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, content);
+    districtVersions[code] = hash;
+  }
+  await writeFile(join(output, 'data/listings.json'), JSON.stringify({
+    feedState: listingData.feedState, districts: districtVersions, providers: [], listings: [],
+  }) + '\n');
 }
-await writeFile(join(output, 'data/listings.json'), JSON.stringify({
-  feedState: listingData.feedState, districts: districtVersions, providers: [], listings: [],
-}) + '\n');
 console.log(`Pages 배포 파일 검증 완료: ${regions.length}개 시·군·구, 정상 매매 ${total}건`);
