@@ -42,6 +42,14 @@ function updateUrl() {
     else url.searchParams.delete(key);
   }
   history.replaceState(null, '', url);
+  updateQuotesLink();
+}
+
+function updateQuotesLink() {
+  const url = new URL('./quotes.html', location.href);
+  if (controls.district.value) url.searchParams.set('gu', controls.district.value);
+  if (controls.area.value !== 'all') url.searchParams.set('area', controls.area.value);
+  $('quotes-link').href = url.href;
 }
 
 function monthLabel(month) {
@@ -309,6 +317,7 @@ async function load({ bootstrap = false } = {}) {
       setDistricts(district);
       const area = params.get('area');
       if (['59', '74', '84'].includes(area)) controls.area.value = area;
+      updateQuotesLink();
     }
     if (state.tab === 'listings') {
       const data = await getJson('data/listings.json', signal);
@@ -412,7 +421,10 @@ if (LISTINGS_ENABLED) {
   $('results-panel').tabIndex = 0;
   setTab(requestedListings ? 'listings' : 'trades');
 } else if (requestedListings) {
-  pageUrl.searchParams.delete('view');
-  history.replaceState(null, '', pageUrl);
+  const quotesUrl = new URL('./quotes.html', pageUrl);
+  for (const key of ['gu', 'area']) {
+    if (pageUrl.searchParams.has(key)) quotesUrl.searchParams.set(key, pageUrl.searchParams.get(key));
+  }
+  location.replace(quotesUrl);
 }
-load({ bootstrap: true });
+if (LISTINGS_ENABLED || !requestedListings) load({ bootstrap: true });

@@ -9,7 +9,7 @@ const dayFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' });
 const timeFormat = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul', dateStyle: 'short', timeStyle: 'short',
 });
-const areaRanges = { '59': [57, 61], '74': [72, 76], '84': [80, 85] };
+export const AREA_RANGES = { '59': [57, 61], '74': [72, 76], '84': [80, 85] };
 const snapshotRevision = /^\d{8}T\d{9}Z$/;
 const monthKey = /^\d{4}(0[1-9]|1[0-2])$/;
 const districtKey = /^\d{5}$/;
@@ -78,7 +78,7 @@ function matchesApartment(row, query) {
 }
 
 export function filterRecords(records, filters) {
-  const [min, max] = areaRanges[filters.area] ?? [0, Infinity];
+  const [min, max] = AREA_RANGES[filters.area] ?? [0, Infinity];
   const query = searchKey(filters.search);
   return records.filter(row => row.areaM2 >= min && row.areaM2 <= max
     && (!query || matchesApartment(row, query))

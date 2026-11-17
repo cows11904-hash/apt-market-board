@@ -30,6 +30,8 @@ button:disabled { cursor: default; }
 .compass::after { content: ''; width: 10px; height: 16px; background: linear-gradient(155deg, #c7e8d8 49%, #589182 51%); clip-path: polygon(50% 0, 100% 100%, 50% 76%, 0 100%); transform: rotate(37deg); }
 .top-link { color: #d6e6e1; font-size: 13px; text-decoration: none; }
 .top-link span { padding-left: 4px; }
+.top-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+.top-link-feature { padding: 5px 9px; border: 1px solid #8db9ab82; border-radius: 7px; white-space: nowrap; }
 .hero { position: relative; overflow: hidden; background: linear-gradient(105deg, #153238 8%, #17413e 77%, #245d50); color: #fff; }
 .hero::before { content: ''; position: absolute; inset: 0; background: repeating-radial-gradient(ellipse 440px 272px at 83% 80%, transparent 0 32px, #c7eee013 33px 34px); pointer-events: none; mask-image: linear-gradient(90deg, transparent 25%, #000); }
 .hero-in { position: relative; padding: 39px 0 43px; display: flex; justify-content: space-between; align-items: center; gap: 30px; }
@@ -106,6 +108,27 @@ tr:last-child td { border-bottom: 0; }
 .guide-body strong { color: var(--ink); margin-right: 4px; }
 footer { border-top: 1px solid var(--line); }
 .footer-in { display: flex; gap: 10px; justify-content: space-between; padding: 15px 0; color: var(--muted); font-size: 12px; }
+.quote-workspace { padding: 18px 0 38px; }
+.quote-filters-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr) minmax(0, 1fr); }
+.quote-dashboard { display: grid; grid-template-columns: minmax(0, 1.17fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; align-items: start; }
+.quote-card { padding: 17px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; min-width: 0; }
+.quote-card-heading { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.quote-card-heading h2 { margin: 0; font-size: 22px; letter-spacing: -.045em; }
+.quote-card-heading p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.quote-status { border-radius: 6px; padding: 3px 8px; color: #675424; background: #fff1d4; font-size: 12px; font-weight: 700; }
+.quote-status[data-tone="ready"] { background: #e5f3eb; color: var(--teal); }
+.quote-status[data-tone="error"] { background: #fce9e1; color: #942f20; }
+.quote-message { margin: 0; padding: 13px; border: 1px solid #dce9e2; background: #f1f7f3; color: #365b51; border-radius: 9px; font-size: 14px; }
+.quote-table { margin-top: 12px; }
+.quote-table .evidence { white-space: normal; }
+.quote-table td { overflow-wrap: anywhere; }
+.quote-table td.money { white-space: normal; }
+.quote-actions { margin-top: 12px; }
+.quote-map { min-height: 336px; display: grid; border: 1px solid #d3e1d9; border-radius: 10px; overflow: hidden; background: #edf4ee; }
+.quote-map iframe, .quote-map-canvas { display: block; border: 0; width: 100%; height: 334px; }
+.map-placeholder { align-self: center; justify-self: center; padding: 0 16px; color: var(--muted); font-size: 14px; }
+.map-hint, .map-credit { color: var(--muted); font-size: 12px; margin: 7px 0 0; }
+.map-credit { display: flex; flex-wrap: wrap; gap: 3px 7px; }
 @media (max-width: 900px) {
   th, td { padding-left: 8px; padding-right: 8px; }
   th:first-child, td:first-child { padding-left: 12px; }
@@ -113,6 +136,9 @@ footer { border-top: 1px solid var(--line); }
 @media (max-width: 720px) {
   .shell { width: calc(100% - 28px); }
   .topbar-in { min-height: 54px; }
+  .top-actions { gap: 8px; }
+  .top-actions .top-link { font-size: 12px; }
+  .top-link-feature { padding: 5px 6px; }
   .brand { font-size: 19px; gap: 8px; }
   .compass { width: 27px; height: 27px; }
   .hero-in { align-items: flex-start; flex-direction: column; gap: 15px; padding: 24px 0 19px; }
@@ -145,4 +171,12 @@ footer { border-top: 1px solid var(--line); }
   tbody .source-cell { border-top: 1px solid #e4ece7; padding-top: 6px; }
   tbody .evidence time { display: inline; margin-left: 6px; }
   .money { white-space: normal; }
+  .quote-workspace { padding-top: 12px; }
+  .quote-filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quote-filters-grid > label:last-child { grid-column: 1 / -1; }
+  .quote-dashboard { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+  .quote-card { padding: 12px; }
+  .quote-card-heading h2 { font-size: 19px; }
+  .quote-map { min-height: 260px; }
+  .quote-map iframe, .quote-map-canvas { height: 258px; }
 }

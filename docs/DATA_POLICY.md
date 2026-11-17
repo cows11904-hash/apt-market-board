@@ -32,3 +32,11 @@
 3. GitHub Actions 저장소 Secret `LISTINGS_FEED_URL`에 HTTPS 피드 주소를, 인증이 필요한 경우 `LISTINGS_FEED_TOKEN`에 Bearer 값을 등록합니다. 빌드가 피드를 조회한 뒤 활성 지역의 유효 매물만 구별 공개 파일로 만들고, 이 파일은 Pages에만 배포합니다. 피드의 승인 주장과 계약에 없는 필드는 공개 출력에 사용하지 않습니다. 연결된 피드가 실패하면 그 매물을 숨기고 페이지에 수집 실패를 표시합니다.
 
 철회·만료된 매물과 새 전체 응답에서 빠진 매물은 다음 배포의 공개 파일에서 제외합니다. 열린 화면은 렌더링할 때 유효기간을 다시 확인합니다. 다음 수집 전 가격 변경이나 철회가 반영되지 않을 수 있고, 여러 중개사가 같은 세대를 올리면 별개 매물로 보일 수 있습니다.
+
+## 리치고 평형별 호가 집계
+
+- [리치고 제휴 안내](https://m.richgo.ai/en/partners)의 정기 공급은 사용 범위를 협의합니다. [기본 파트너 API 이용 조건](https://m.richgo.ai/developers#terms)은 웹사이트나 저장소에 응답을 게시하는 일을 제한합니다. 공개 화면과 GitHub Pages에서 내려받을 수 있는 JSON의 게시를 모두 허용받은 피드를 연결합니다.
+- 배포 작업은 피드를 한 번 조회하고 지역별 파일을 생성합니다. 방문자 화면은 같은 사이트에서 배포한 파일을 읽습니다. 계산에 쓰는 제휴 피드 주소와 인증 정보는 Actions Secret에 저장합니다. 수집에 실패하면 해당 배포에서는 호가 수치를 제시하지 않고 리치고 원문을 연결합니다.
+- 공급 형식은 `application/json`의 `complexes` 배열입니다. 각 항목에는 5자리 `districtCode`, 선택 항목인 법정동 `dong`, `snapshot`을 넣습니다. `snapshot`에는 리치고 `danji_id`, `name`, `pyeongs` 배열을 사용합니다. 평형마다 `private_area_m2`(숫자 또는 `"84.78~84.96"` 형식)와 `sale_listings`의 `count`, `asking_min_manwon`, `asking_max_manwon`, `as_of`를 사용합니다. 호가가 비어 있는 경우 하한·상한을 함께 `null`로 전달합니다. 실제 제휴 공급의 필드가 다르면 변환 프로그램에서 이 형식으로 맞춥니다.
+- 호가의 만 원을 원 단위로 환산합니다. 평형별 원 제공처 기준일과 피드 확인 시각을 각각 표시합니다. 하나의 전용면적 범위는 해당 범위 전체의 집계입니다. 세부 동·층, 호가 구간 안 개별 가격과 복수 등록 여부는 집계만으로 판별하기 어렵습니다.
+- 카카오맵 앱 설정 전에는 [OpenStreetMap](https://www.openstreetmap.org/copyright) 공유 지도를 표시합니다. 지역 범위는 [통계청 SGIS](https://sgis.kostat.go.kr/)의 행정동 경계를 기반으로 한 [vuski/admdongkor 2026-10-01 자료](https://github.com/vuski/admdongkor/tree/master/ver20261001)에서 사각 범위를 계산했습니다. 가공 경계 자료에는 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)이 적용됩니다.

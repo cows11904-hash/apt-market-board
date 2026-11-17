@@ -47,6 +47,10 @@ jobs:
         env:
           LISTINGS_FEED_URL: ${{ secrets.LISTINGS_FEED_URL }}
           LISTINGS_FEED_TOKEN: ${{ secrets.LISTINGS_FEED_TOKEN }}
+          RICHGO_QUOTES_FEED_URL: ${{ secrets.RICHGO_QUOTES_FEED_URL }}
+          RICHGO_QUOTES_FEED_TOKEN: ${{ secrets.RICHGO_QUOTES_FEED_TOKEN }}
+          RICHGO_PUBLIC_THROUGH: ${{ vars.RICHGO_PUBLIC_THROUGH }}
+          KAKAO_MAP_JAVASCRIPT_KEY: ${{ vars.KAKAO_MAP_JAVASCRIPT_KEY }}
         run: npm run build
       - name: Record snapshot and refresh status
         run: |
