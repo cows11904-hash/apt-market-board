@@ -13,8 +13,7 @@ const state = { cities: [], areas: {}, manifest: null, rows: [], complexes: [], 
 let request;
 let tradeManifest;
 const showMap = createQuoteMap({
-  frame: $('map-frame'), canvas: $('map-kakao'), placeholder: $('map-placeholder'),
-  hint: $('map-hint'), credit: $('map-osm-credit'),
+  raster: $('map-raster'), canvas: $('map-kakao'), placeholder: $('map-placeholder'), hint: $('map-hint'),
 });
 
 async function readJson(path, signal) {

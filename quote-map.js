@@ -8,13 +8,6 @@ export function validMapBounds(bounds) {
   return west >= -180 && east <= 180 && south >= -90 && north <= 90 && west < east && south < north;
 }
 
-function openStreetMapUrl(bounds) {
-  const url = new URL('https://www.openstreetmap.org/export/embed.html');
-  url.searchParams.set('bbox', bounds.join(','));
-  url.searchParams.set('layer', 'mapnik');
-  return url.href;
-}
-
 function loadKakaoMaps(key) {
   const url = new URL('https://dapi.kakao.com/v2/maps/sdk.js');
   url.searchParams.set('appkey', key);
@@ -71,24 +64,44 @@ function findApartment(maps, query, districtName, complex) {
   });
 }
 
-export function createQuoteMap({ frame, canvas, placeholder, hint, credit }) {
+export function createQuoteMap({ raster, canvas, placeholder, hint }) {
   let sdk;
   let map;
   let marker;
+  let regionalMap;
+  let regionalBounds;
   let selectionKey;
   let version = 0;
 
   function showRegionalMap(bounds, regionName, apartment) {
     canvas.hidden = true;
-    frame.hidden = !bounds;
-    placeholder.hidden = Boolean(bounds);
-    credit.hidden = !bounds;
-    if (bounds) {
-      const url = openStreetMapUrl(bounds);
-      if (frame.getAttribute('src') !== url) frame.src = url;
-      frame.title = regionName + ' OpenStreetMap 지도';
-    } else {
-      placeholder.textContent = '이 지역의 지도 범위를 준비하고 있습니다.';
+    const leaflet = globalThis.L;
+    const available = Boolean(bounds && leaflet);
+    raster.hidden = !available;
+    placeholder.hidden = available;
+    hint.textContent = '';
+    if (!available) {
+      placeholder.textContent = bounds ? '지도를 불러오지 못했습니다. 카카오맵에서 위치를 확인할 수 있습니다.' : '이 지역의 지도 범위를 준비하고 있습니다.';
+      return;
+    }
+    raster.setAttribute('aria-label', regionName + ' OpenStreetMap 지도');
+    if (!regionalMap) {
+      regionalMap = leaflet.map(raster, { scrollWheelZoom: false });
+      regionalMap.attributionControl.setPrefix(false);
+      leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        keepBuffer: 0,
+        updateWhenIdle: true,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap 기여자</a>',
+      }).on('tileerror', () => {
+        if (!raster.hidden) hint.textContent = '일부 지도를 불러오지 못했습니다. 카카오맵에서도 위치를 확인할 수 있습니다.';
+      }).addTo(regionalMap);
+    }
+    if (bounds !== regionalBounds) {
+      const [west, south, east, north] = bounds;
+      regionalMap.invalidateSize({ pan: false });
+      regionalMap.fitBounds([[south, west], [north, east]], { animate: false });
+      regionalBounds = bounds;
     }
     hint.textContent = apartment ? '지도는 지역 범위를 표시합니다. 단지 위치는 카카오맵에서 확인하세요.' : '';
   }
@@ -112,9 +125,8 @@ export function createQuoteMap({ frame, canvas, placeholder, hint, credit }) {
       if (current !== version) return;
       const [west, south, east, north] = bounds;
       const center = new maps.LatLng((south + north) / 2, (west + east) / 2);
-      frame.hidden = true;
+      raster.hidden = true;
       placeholder.hidden = true;
-      credit.hidden = true;
       canvas.hidden = false;
       if (!map) {
         map = new maps.Map(canvas, { center, level: 7 });

@@ -53,6 +53,15 @@ await mkdir(output, { recursive: true });
 
 const contentHash = content => createHash('sha256').update(content).digest('hex').slice(0, 12);
 
+const leaflet = join(root, 'node_modules/leaflet');
+const leafletPath = `vendor/leaflet-${contentHash(await readFile(join(leaflet, 'dist/leaflet.js')))}`;
+const leafletOutput = join(output, leafletPath);
+await mkdir(leafletOutput, { recursive: true });
+for (const asset of ['leaflet.js', 'leaflet.js.map', 'leaflet.css', 'images']) {
+  await cp(join(leaflet, 'dist', asset), join(leafletOutput, asset), { recursive: true });
+}
+await cp(join(leaflet, 'LICENSE'), join(leafletOutput, 'LICENSE'));
+
 async function writeAsset(name, content) {
   const extension = extname(name);
   const publishedName = `${name.slice(0, -extension.length)}.${contentHash(content)}${extension}`;
@@ -75,6 +84,7 @@ const quotesName = await writeAsset('quotes.js', quotes);
 for (const [page, script, compiled] of [['index.html', 'app.js', appName], ['quotes.html', 'quotes.js', quotesName]]) {
   const html = (await readFile(join(root, page), 'utf8'))
     .replace('./styles.css', `./${styles}`)
+    .replaceAll('./vendor/leaflet/', `./${leafletPath}/`)
     .replace(`./${script}`, `./${compiled}`);
   await writeFile(join(output, page), html);
 }

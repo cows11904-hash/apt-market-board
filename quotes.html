@@ -9,6 +9,8 @@
   <title>시세나침반 | 매물 호가 · 지도</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
+  <script defer src="./vendor/leaflet/leaflet.js"></script>
   <script type="module" src="./quotes.js"></script>
 </head>
 <body>
@@ -79,13 +81,12 @@
             <a class="button button-outline" id="map-kakao-link" href="https://map.kakao.com/link/search/서울특별시" target="_blank" rel="noopener noreferrer">카카오맵에서 열기 <span aria-hidden="true">↗</span></a>
           </div>
           <div class="quote-map">
-            <iframe id="map-frame" title="선택한 지역의 OpenStreetMap 지도" loading="lazy" hidden></iframe>
+            <div id="map-raster" class="quote-map-canvas" role="region" aria-label="선택한 지역의 OpenStreetMap 지도" hidden></div>
             <div id="map-kakao" class="quote-map-canvas" role="region" aria-label="선택한 지역의 카카오 지도" hidden></div>
             <p id="map-placeholder" class="map-placeholder">지역 지도를 불러오는 중입니다.</p>
           </div>
           <p id="map-hint" class="map-hint"></p>
           <p class="map-credit">
-            <a id="map-osm-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap 기여자</a>
             <span>지역 범위</span> <a href="https://sgis.kostat.go.kr/" target="_blank" rel="noopener noreferrer">SGIS</a>
             <a href="https://github.com/vuski/admdongkor/tree/master/ver20261001" target="_blank" rel="noopener noreferrer">vuski/admdongkor</a>
             <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>

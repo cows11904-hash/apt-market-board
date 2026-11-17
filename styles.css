@@ -124,8 +124,8 @@ footer { border-top: 1px solid var(--line); }
 .quote-table td { overflow-wrap: anywhere; }
 .quote-table td.money { white-space: normal; }
 .quote-actions { margin-top: 12px; }
-.quote-map { min-height: 336px; display: grid; border: 1px solid #d3e1d9; border-radius: 10px; overflow: hidden; background: #edf4ee; }
-.quote-map iframe, .quote-map-canvas { display: block; border: 0; width: 100%; height: 334px; }
+.quote-map { min-height: 336px; display: grid; isolation: isolate; border: 1px solid #d3e1d9; border-radius: 10px; overflow: hidden; background: #edf4ee; }
+.quote-map-canvas { width: 100%; height: 334px; }
 .map-placeholder { align-self: center; justify-self: center; padding: 0 16px; color: var(--muted); font-size: 14px; }
 .map-hint, .map-credit { color: var(--muted); font-size: 12px; margin: 7px 0 0; }
 .map-credit { display: flex; flex-wrap: wrap; gap: 3px 7px; }
@@ -178,5 +178,5 @@ footer { border-top: 1px solid var(--line); }
   .quote-card { padding: 12px; }
   .quote-card-heading h2 { font-size: 19px; }
   .quote-map { min-height: 260px; }
-  .quote-map iframe, .quote-map-canvas { height: 258px; }
+  .quote-map-canvas { height: 258px; }
 }
