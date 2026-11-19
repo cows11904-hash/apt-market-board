@@ -108,27 +108,71 @@ tr:last-child td { border-bottom: 0; }
 .guide-body strong { color: var(--ink); margin-right: 4px; }
 footer { border-top: 1px solid var(--line); }
 .footer-in { display: flex; gap: 10px; justify-content: space-between; padding: 15px 0; color: var(--muted); font-size: 12px; }
-.quote-workspace { padding: 18px 0 38px; }
-.quote-filters-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.9fr) minmax(0, 1fr); }
-.quote-dashboard { display: grid; grid-template-columns: minmax(0, 1.17fr) minmax(0, 1fr); gap: 16px; margin-top: 18px; align-items: start; }
-.quote-card { padding: 17px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; min-width: 0; }
+.quote-page .shell { width: min(1280px, calc(100% - 48px)); }
+.quote-page .hero-in { padding: 25px 0 28px; }
+.quote-page h1 { font-size: clamp(28px, 3.2vw, 38px); }
+.quote-page .hero-copy { margin-top: 9px; font-size: 15px; }
+.quote-page .filters label { font-size: 14px; }
+.quote-page .button { min-height: 42px; font-size: 14px; white-space: normal; }
+.quote-page select { appearance: none; padding-right: 30px; background-image: linear-gradient(45deg, transparent 50%, #46685e 50%), linear-gradient(135deg, #46685e 50%, transparent 50%); background-size: 5px 5px; background-position: calc(100% - 16px) 20px, calc(100% - 11px) 20px; background-repeat: no-repeat; }
+.quote-workspace { padding: 20px 0 38px; }
+.quote-filters-grid { grid-template-columns: 190px minmax(0, 1fr) 180px; }
+.search-input-wrap { display: block; }
+.search-input-wrap input { padding-left: 14px; }
+.quote-dashboard { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(320px, 1fr); gap: 18px; margin-top: 18px; align-items: start; }
+.quote-primary, .quote-sidebar { display: grid; min-width: 0; gap: 16px; }
+.quote-sidebar { position: sticky; top: 16px; }
+.quote-card { padding: 21px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; min-width: 0; }
 .quote-card-heading { display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .quote-card-heading h2 { margin: 0; font-size: 22px; letter-spacing: -.045em; }
-.quote-card-heading p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.quote-card-heading p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.complex-results { border-top: 1px solid var(--line); }
+.complex-result { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; min-height: 83px; text-align: left; background: #fff; color: var(--ink); padding: 15px 4px; border: 0; border-bottom: 1px solid var(--line); }
+.complex-result:hover { background: #f0f7f3; }
+.complex-result-name, .complex-result-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.complex-result-name strong { font-size: 17px; letter-spacing: -.03em; overflow-wrap: anywhere; }
+.complex-location { font-size: 14px; color: var(--muted); }
+.complex-result-info { flex-shrink: 0; align-items: flex-end; font-size: 13px; color: #3e6157; }
+.complex-result-info small { color: var(--muted); font-size: 12px; }
+.catalog-note { font-size: 12px; color: var(--muted); margin: 15px 0 0; }
+.complex-empty { padding: 22px 14px; margin: 0; color: var(--muted); font-size: 15px; background: #f4f8f5; border-radius: 8px; }
+.more-results { width: 100%; margin-top: 15px; }
+.complex-detail .detail-address { margin-top: 0; margin-bottom: 4px; color: var(--teal); }
+.complex-detail #complex-name { font-size: 27px; }
+.detail-scope { margin: 0 0 17px; font-size: 14px; color: var(--muted); }
+.complex-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.complex-metrics > div { display: flex; flex-direction: column; min-width: 0; padding: 13px 12px; border-radius: 10px; background: #edf5f0; }
+.complex-metrics span { font-size: 13px; color: #45655b; }
+.complex-metrics strong { margin-top: 8px; font-size: 22px; font-variant-numeric: tabular-nums; line-height: 1.35; letter-spacing: -.045em; overflow-wrap: anywhere; }
+.complex-metrics .metric-range { font-size: 17px; line-height: 1.5; }
+.complex-metrics small { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.complex-evidence { display: flex; gap: 4px 9px; flex-wrap: wrap; margin: 10px 0 22px; color: var(--muted); font-size: 12px; }
+.recent-trades-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.recent-trades-heading h3 { font-size: 17px; margin: 0; }
+.recent-trades-heading > span { font-size: 12px; color: var(--muted); }
+.complex-trade-table th, .complex-trade-table td { padding: 12px 9px; }
+.complex-trade-table .money { font-size: 14px; }
+.complex-trade-table td:nth-child(2) { font-size: 12px; }
+.asking-card .quote-card-heading h2 { font-size: 18px; }
 .quote-status { border-radius: 6px; padding: 3px 8px; color: #675424; background: #fff1d4; font-size: 12px; font-weight: 700; }
 .quote-status[data-tone="ready"] { background: #e5f3eb; color: var(--teal); }
 .quote-status[data-tone="error"] { background: #fce9e1; color: #942f20; }
 .quote-message { margin: 0; padding: 13px; border: 1px solid #dce9e2; background: #f1f7f3; color: #365b51; border-radius: 9px; font-size: 14px; }
-.quote-table { margin-top: 12px; }
+.quote-table { margin-top: 12px; overflow-x: auto; }
+.quote-table table { min-width: 400px; }
 .quote-table .evidence { white-space: normal; }
 .quote-table td { overflow-wrap: anywhere; }
 .quote-table td.money { white-space: normal; }
 .quote-actions { margin-top: 12px; }
-.quote-map { min-height: 336px; display: grid; isolation: isolate; border: 1px solid #d3e1d9; border-radius: 10px; overflow: hidden; background: #edf4ee; }
-.quote-map-canvas { width: 100%; height: 334px; }
+.quote-map { min-height: 310px; display: grid; isolation: isolate; border: 1px solid #d3e1d9; border-radius: 10px; overflow: hidden; background: #edf4ee; }
+.quote-map-canvas { width: 100%; height: 308px; }
 .map-placeholder { align-self: center; justify-self: center; padding: 0 16px; color: var(--muted); font-size: 14px; }
 .map-hint, .map-credit { color: var(--muted); font-size: 12px; margin: 7px 0 0; }
 .map-credit { display: flex; flex-wrap: wrap; gap: 3px 7px; }
+@media (max-width: 1060px) {
+  .quote-dashboard { grid-template-columns: minmax(0, 1fr); }
+  .quote-sidebar { position: static; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
+}
 @media (max-width: 900px) {
   th, td { padding-left: 8px; padding-right: 8px; }
   th:first-child, td:first-child { padding-left: 12px; }
@@ -172,11 +216,27 @@ footer { border-top: 1px solid var(--line); }
   tbody .evidence time { display: inline; margin-left: 6px; }
   .money { white-space: normal; }
   .quote-workspace { padding-top: 12px; }
+  .quote-page .shell { width: calc(100% - 28px); }
+  .quote-page .hero-in { padding: 19px 0 22px; }
+  .quote-page .hero-copy { font-size: 14px; }
   .quote-filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .quote-filters-grid > label:last-child { grid-column: 1 / -1; }
+  .quote-filters-grid .complex-query { grid-column: 1 / -1; grid-row: 1; }
   .quote-dashboard { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 12px; }
-  .quote-card { padding: 12px; }
+  .quote-sidebar { grid-template-columns: minmax(0, 1fr); }
+  .quote-card { padding: 15px; }
   .quote-card-heading h2 { font-size: 19px; }
+  .complex-result { gap: 9px; min-height: 85px; }
+  .complex-result-name strong { font-size: 16px; }
+  .complex-result-info { font-size: 13px; max-width: 43%; }
+  .complex-result-info small { font-size: 12px; }
+  .complex-detail #complex-name { font-size: 23px; }
+  .complex-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .complex-metrics > div:last-child { grid-column: 1 / -1; }
+  .complex-metrics strong { font-size: 21px; }
+  .complex-metrics > div:last-child strong { font-size: 19px; }
+  .complex-trade-table td, .complex-trade-table td:first-child { padding: 0; }
+  .complex-trade-table td:first-child { padding-bottom: 6px; }
+  .quote-table table { min-width: 0; }
   .quote-map { min-height: 260px; }
   .quote-map-canvas { height: 258px; }
 }

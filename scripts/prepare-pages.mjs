@@ -8,6 +8,7 @@ import { validMapBounds } from '../quote-map.js';
 import { prepareListings } from './listings-feed.mjs';
 import { prepareRichgoQuotes } from './richgo-quotes-feed.mjs';
 import { pageSecurityPolicy } from './page-security.mjs';
+import { buildComplexCatalog, complexCatalogPath, validateComplexCatalog } from '../complex-data.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = join(root, 'dist');
@@ -22,11 +23,14 @@ if (!mapBounds || !validMapBounds(mapBounds['11'])
 const manifest = validateManifest(await json('data/transactions.json'));
 const files = ['.nojekyll', 'data/regions.json', 'data/transactions.json', 'data/district-map.json'];
 let total = 0;
+const tradesByDistrict = new Map();
 if (manifest.revision) {
   for (const code of Object.keys(manifest.districts)) {
     if (!regionCodes.has(code)) throw new Error(`공개 지역 목록에 없는 시·군·구입니다. (${code})`);
     const path = districtDataPath(manifest, code);
-    total += validateDistrict(await json(path), manifest, code).length;
+    const trades = validateDistrict(await json(path), manifest, code);
+    total += trades.length;
+    tradesByDistrict.set(code, trades);
     files.push(path);
   }
   if (!total) throw new Error('수집 기록에 연결된 정상 매매가 없습니다.');
@@ -76,10 +80,14 @@ const app = (await readFile(join(root, 'app.js'), 'utf8')).replace('./market-dat
 const appName = await writeAsset('app.js', app);
 const richgoModule = await writeAsset('richgo-quotes.js',
   (await readFile(join(root, 'richgo-quotes.js'), 'utf8')).replace('./market-data.js', `./${marketData}`));
+const complexModule = await writeAsset('complex-data.js',
+  (await readFile(join(root, 'complex-data.js'), 'utf8'))
+    .replace('./market-data.js', `./${marketData}`).replace('./richgo-quotes.js', `./${richgoModule}`));
 const mapModule = await writeAsset('quote-map.js', await readFile(join(root, 'quote-map.js')));
 const quotes = (await readFile(join(root, 'quotes.js'), 'utf8'))
   .replace('./market-data.js', `./${marketData}`)
   .replace('./richgo-quotes.js', `./${richgoModule}`)
+  .replace('./complex-data.js', `./${complexModule}`)
   .replace('./quote-map.js', `./${mapModule}`);
 const quotesName = await writeAsset('quotes.js', quotes);
 for (const [page, script, compiled] of [['index.html', 'app.js', appName], ['quotes.html', 'quotes.js', quotesName]]) {
@@ -124,5 +132,13 @@ const quotesManifest = validateQuoteManifest({
   schemaVersion: 1, state: richgoQuotes.state, districts: quoteVersions, checkedAt: richgoQuotes.checkedAt,
   publicThrough: richgoQuotes.publicThrough, kakaoJavaScriptKey,
 });
+const apartments = buildComplexCatalog(tradesByDistrict, richgoQuotes.districts);
+const catalog = { schemaVersion: 1, tradeRevision: manifest.revision, apartments };
+validateComplexCatalog(catalog, regionCodes);
+const catalogContent = JSON.stringify(catalog) + '\n';
+quotesManifest.catalogHash = contentHash(catalogContent);
+const catalogTarget = join(output, complexCatalogPath(quotesManifest.catalogHash));
+await mkdir(dirname(catalogTarget), { recursive: true });
+await writeFile(catalogTarget, catalogContent);
 await writeFile(join(output, 'data/richgo-quotes.json'), JSON.stringify(quotesManifest) + '\n');
 console.log(`Pages 배포 파일 검증 완료: ${regions.length}개 시·군·구, 정상 매매 ${total}건`);

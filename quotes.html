@@ -6,22 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#142e32">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta name="description" content="서울 아파트의 평형별 매매 호가와 주변 지도를 확인하세요.">
-  <title>시세나침반 | 매물 호가 · 지도</title>
+  <meta name="description" content="단지명과 법정동으로 서울 아파트를 검색하고 최근 실거래와 주변 지도를 확인하세요.">
+  <title>시세나침반 | 단지 검색 · 실거래 · 지도</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
   <script defer src="./vendor/leaflet/leaflet.js"></script>
   <script type="module" src="./quotes.js"></script>
 </head>
-<body>
+<body class="quote-page">
   <a class="skip" href="#main">본문으로 이동</a>
   <header class="topbar">
     <div class="shell topbar-in">
       <a class="brand" href="./" aria-label="시세나침반 홈"><span class="compass" aria-hidden="true"></span>시세나침반</a>
       <nav class="top-actions" aria-label="서비스 메뉴">
         <a class="top-link top-link-feature" id="trades-link" href="./">실거래가 보기</a>
-        <a class="top-link" href="#data-guide">데이터 안내 <span aria-hidden="true">↓</span></a>
+        <a class="top-link" href="#data-guide">데이터 안내</a>
       </nav>
     </div>
   </header>
@@ -30,28 +30,84 @@
       <div class="shell hero-in">
         <div>
           <p class="hero-region" id="quote-region-name">서울특별시 · 25개 자치구</p>
-          <h1 id="page-title">매물 호가 · 지도</h1>
-          <p class="hero-copy">단지를 선택해 평형별 호가와 주변 위치를 살펴보세요.</p>
+          <h1 id="page-title">단지 검색 · 실거래</h1>
+          <p class="hero-copy">단지명·법정동으로 찾고, 최근 신고가격과 위치를 확인하세요.</p>
         </div>
       </div>
     </section>
     <div class="shell quote-workspace">
-      <form class="filters" id="quote-filters" aria-label="호가 조회 조건">
+      <form class="filters" id="quote-filters" role="search" aria-label="아파트 단지 검색">
         <div class="filter-heading">
-          <h2>검색 조건</h2>
+          <h2>단지 찾기</h2>
           <button type="button" id="quote-reset" class="text-button">초기화</button>
         </div>
         <div class="filters-grid quote-filters-grid">
           <label>시·군·구 <select id="quote-district" disabled><option value="">지역 확인 중</option></select></label>
-          <label>아파트 단지 <select id="quote-complex" disabled><option value="">시·군·구를 먼저 선택하세요</option></select></label>
-          <label>전용면적 <select id="quote-area"><option value="all">전체 면적</option><option value="59">57~61㎡</option><option value="74">72~76㎡</option><option value="84">80~85㎡</option></select></label>
+          <label class="complex-query">단지명·동 이름
+            <span class="search-input-wrap">
+              <input id="quote-search" type="search" placeholder="아파트명 또는 법정동을 입력하세요" autocomplete="off" maxlength="120" aria-controls="complex-results" disabled>
+            </span>
+          </label>
+          <label>전용면적 <select id="quote-area" disabled><option value="all">전체 면적</option><option value="59">57~61㎡</option><option value="74">72~76㎡</option><option value="84">80~85㎡</option></select></label>
         </div>
       </form>
       <div class="quote-dashboard">
-        <section class="quote-card" aria-labelledby="quotes-heading" aria-busy="true" id="quote-result">
+        <div class="quote-primary">
+          <section class="quote-card complex-results-panel" aria-labelledby="complex-results-heading" id="complex-results-panel">
+            <div class="quote-card-heading">
+              <div><h2 id="complex-results-heading">검색 결과</h2><p id="complex-results-count" role="status">단지 목록을 불러오는 중입니다.</p></div>
+            </div>
+            <div id="complex-results" class="complex-results" aria-busy="true"></div>
+            <p id="complex-results-empty" class="complex-empty" hidden>검색 결과가 없습니다. 단지명 일부나 동 이름으로 다시 검색해 보세요.</p>
+            <button id="complex-more" type="button" class="button button-outline more-results" hidden>단지 더 보기</button>
+            <button id="complex-retry" type="button" class="button button-outline" hidden>다시 불러오기</button>
+            <p id="complex-catalog-note" class="catalog-note"></p>
+          </section>
+          <section class="quote-card complex-detail" aria-labelledby="complex-name" id="complex-detail" hidden>
+            <div class="quote-card-heading">
+              <div><p class="detail-address" id="complex-address"></p><h2 id="complex-name"></h2></div>
+              <button type="button" id="complex-back" class="text-button">검색 결과로</button>
+            </div>
+            <p class="detail-scope" id="complex-scope"></p>
+            <p class="notice" id="trade-notice" hidden></p>
+            <div id="complex-metrics" class="complex-metrics" hidden>
+              <div><span>최근 실거래</span><strong id="complex-latest-price"></strong><small id="complex-latest-spec"></small></div>
+              <div><span>조회 가격 범위</span><strong class="metric-range" id="complex-price-range"></strong><small>선택한 전용면적 범위</small></div>
+              <div><span>수집기간 내 거래</span><strong id="complex-trade-count"></strong><small id="complex-trade-types"></small></div>
+            </div>
+            <p id="complex-evidence" class="complex-evidence" hidden><a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">국토교통부 매매 상세 API</a><span id="complex-checked-at"></span></p>
+            <div class="recent-trades-heading"><h3>최근 신고 내역</h3><span id="complex-trade-period"></span></div>
+            <p id="complex-trades-empty" class="complex-empty" role="status"></p>
+            <div class="table-wrap complex-trade-table" id="complex-trades-table" hidden>
+              <table role="table">
+                <caption class="sr-only">선택한 아파트의 최근 매매 실거래</caption>
+                <thead role="rowgroup"><tr role="row">
+                  <th scope="col">계약일</th><th scope="col">전용면적 · 층</th><th scope="col">실거래가</th><th scope="col">거래 유형</th><th scope="col">출처 · 확인일</th>
+                </tr></thead>
+                <tbody id="complex-trade-rows" role="rowgroup"></tbody>
+              </table>
+            </div>
+            <button type="button" class="button button-outline more-results" id="complex-trades-more" hidden>실거래 더 보기</button>
+          </section>
+        </div>
+        <aside class="quote-sidebar" aria-label="지도와 매물 호가">
+        <section class="quote-card map-card" aria-labelledby="map-heading">
+          <div class="quote-card-heading">
+            <div><h2 id="map-heading">지역 지도</h2><p id="map-selection">서울특별시</p></div>
+            <a class="button button-outline" id="map-kakao-link" href="https://map.kakao.com/link/search/서울특별시" target="_blank" rel="noopener noreferrer">카카오맵에서 위치 보기</a>
+          </div>
+          <div class="quote-map">
+            <div id="map-raster" class="quote-map-canvas" role="region" aria-label="선택한 지역의 OpenStreetMap 지도" hidden></div>
+            <div id="map-kakao" class="quote-map-canvas" role="region" aria-label="선택한 지역의 카카오 지도" hidden></div>
+            <p id="map-placeholder" class="map-placeholder">지역 지도를 불러오는 중입니다.</p>
+          </div>
+          <p id="map-hint" class="map-hint"></p>
+          <p class="map-credit"><span>지역 범위</span><a href="https://sgis.kostat.go.kr/" target="_blank" rel="noopener noreferrer">SGIS</a><a href="https://github.com/vuski/admdongkor/tree/master/ver20261001" target="_blank" rel="noopener noreferrer">vuski/admdongkor</a><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p>
+        </section>
+        <section class="quote-card asking-card" aria-labelledby="quotes-heading" aria-busy="true" id="quote-result">
           <div class="quote-card-heading">
             <div>
-              <h2 id="quotes-heading">리치고 매물 호가</h2>
+              <h2 id="quotes-heading">매물 호가</h2>
               <p id="quote-selection">서울 아파트</p>
             </div>
             <span class="quote-status" id="quote-status" role="status">확인 중</span>
@@ -70,35 +126,17 @@
             </table>
           </div>
           <div class="quote-actions">
-            <a class="button" id="quote-richgo" href="https://m.richgo.ai/realty/apt-hub/서울" target="_blank" rel="noopener noreferrer"><span id="quote-richgo-label">리치고에서 호가 확인</span> <span aria-hidden="true">↗</span></a>
+            <a class="button" id="quote-richgo" href="https://m.richgo.ai/realty/apt-hub/서울" target="_blank" rel="noopener noreferrer"><span id="quote-richgo-label">리치고에서 호가 확인</span></a>
           </div>
         </section>
-        <section class="quote-card" aria-labelledby="map-heading">
-          <div class="quote-card-heading">
-            <div>
-              <h2 id="map-heading">지역 지도</h2>
-              <p id="map-selection">서울특별시</p>
-            </div>
-            <a class="button button-outline" id="map-kakao-link" href="https://map.kakao.com/link/search/서울특별시" target="_blank" rel="noopener noreferrer">카카오맵에서 열기 <span aria-hidden="true">↗</span></a>
-          </div>
-          <div class="quote-map">
-            <div id="map-raster" class="quote-map-canvas" role="region" aria-label="선택한 지역의 OpenStreetMap 지도" hidden></div>
-            <div id="map-kakao" class="quote-map-canvas" role="region" aria-label="선택한 지역의 카카오 지도" hidden></div>
-            <p id="map-placeholder" class="map-placeholder">지역 지도를 불러오는 중입니다.</p>
-          </div>
-          <p id="map-hint" class="map-hint"></p>
-          <p class="map-credit">
-            <span>지역 범위</span> <a href="https://sgis.kostat.go.kr/" target="_blank" rel="noopener noreferrer">SGIS</a>
-            <a href="https://github.com/vuski/admdongkor/tree/master/ver20261001" target="_blank" rel="noopener noreferrer">vuski/admdongkor</a>
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>
-          </p>
-        </section>
+        </aside>
       </div>
       <details class="data-guide" id="data-guide">
         <summary>데이터 범위와 해석</summary>
         <div class="guide-body">
           <p><strong>호가 집계</strong> 리치고가 집계한 전용면적별 매매 매물 수와 최저·최고 등록가를 표시합니다. 기준일과 피드 확인일은 각각 표시합니다.</p>
-          <p><strong>단지 목록</strong> 이 사이트에 수집된 실거래가 있는 단지와 호가 공급 자료에 포함된 단지에서 선택할 수 있습니다.</p>
+          <p><strong>실거래</strong> 국토교통부 신고 자료에서 해제·증여·무상 이전을 제외한 매매입니다. 직거래는 별도로 표시합니다. 신고와 정정·해제 반영에는 시차가 생길 수 있습니다.</p>
+          <p><strong>단지 목록</strong> 수집기간에 실거래가 있는 단지와 공개 호가 공급 자료에 포함된 단지를 제공합니다. 거래가 없는 단지는 목록에 포함되지 않을 수 있습니다.</p>
           <p><strong>지도 범위</strong> 2026년 10월 1일 자치구 경계를 바탕으로 지도에 표시할 사각 범위를 계산했습니다.</p>
         </div>
       </details>
