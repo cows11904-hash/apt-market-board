@@ -53,6 +53,8 @@ export function parseRecord(item, { code, month, checkedAt }) {
       dong: value(item, 'umdNm', '법정동'),
       building: value(item, 'aptDong', '아파트동명'),
       areaM2, floor, dealDate, priceWon,
+      buildYear: /^(19|20)\d{2}$/.test(value(item, 'buildYear', '건축년도')) ? Number(value(item, 'buildYear', '건축년도')) : null,
+      jibun: value(item, 'jibun', '지번'),
       transactionType: ['직거래', '중개거래'].includes(mode) ? mode : '구분 미확인',
       checkedAt,
     },

@@ -70,6 +70,7 @@ export function createQuoteMap({ raster, canvas, placeholder, hint }) {
   let marker;
   let regionalMap;
   let regionalBounds;
+  let regionalMarker;
   let selectionKey;
   let version = 0;
 
@@ -97,25 +98,36 @@ export function createQuoteMap({ raster, canvas, placeholder, hint }) {
         if (!raster.hidden) hint.textContent = '일부 지도를 불러오지 못했습니다. 카카오맵에서도 위치를 확인할 수 있습니다.';
       }).addTo(regionalMap);
     }
-    if (bounds !== regionalBounds) {
+    regionalMap.invalidateSize({ pan: false });
+    if (regionalMarker) { regionalMarker.remove(); regionalMarker = null; }
+    const coordinates = apartment?.profile?.coordinates;
+    if (coordinates) {
+      const [longitude, latitude] = coordinates;
+      regionalMap.setView([latitude, longitude], 16, { animate: false });
+      regionalMarker = leaflet.circleMarker([latitude, longitude], { radius: 9, color: '#fff', weight: 3, fillColor: '#17665d', fillOpacity: 1 }).addTo(regionalMap);
+      const label = document.createElement('span'); label.textContent = apartment.aptName;
+      regionalMarker.bindTooltip(label, { permanent: true, direction: 'top' });
+      regionalBounds = null;
+    } else if (bounds !== regionalBounds) {
       const [west, south, east, north] = bounds;
       regionalMap.invalidateSize({ pan: false });
       regionalMap.fitBounds([[south, west], [north, east]], { animate: false });
       regionalBounds = bounds;
     }
-    hint.textContent = apartment ? '지도는 지역 범위를 표시합니다. 단지 위치는 카카오맵에서 확인하세요.' : '';
+    hint.textContent = coordinates ? '서울시 제공 좌표 · ' + apartment.aptName
+      : apartment ? '단지 좌표가 없어 지역 범위를 표시합니다. 카카오맵에서 위치를 확인할 수 있습니다.' : '단지를 선택하면 확인된 위치를 표시합니다.';
   }
 
   return async function showMap({ bounds, regionName, query, districtName, complex, kakaoJavaScriptKey }) {
-    const key = JSON.stringify([bounds, query, kakaoJavaScriptKey]);
-    if (key === selectionKey) return;
+    const key = JSON.stringify([bounds, query, complex?.key, complex?.profile?.coordinates, kakaoJavaScriptKey]);
+    if (key === selectionKey) { regionalMap?.invalidateSize({ pan: false }); map?.relayout(); return; }
     selectionKey = key;
     const current = ++version;
     if (!validMapBounds(bounds)) {
       showRegionalMap(null, regionName, complex);
       return;
     }
-    if (!kakaoJavaScriptKey) {
+    if (!kakaoJavaScriptKey || complex?.profile?.coordinates) {
       showRegionalMap(bounds, regionName, complex);
       return;
     }

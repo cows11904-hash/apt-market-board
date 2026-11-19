@@ -36,6 +36,9 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Refresh official apartment profiles
+        continue-on-error: true
+        run: npm run fetch:complexes
       - run: npm test
       - name: Refresh from the official API
         id: refresh

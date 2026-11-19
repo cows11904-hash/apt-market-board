@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "fetch:transactions": "node scripts/fetch-transactions.mjs",
+    "fetch:complexes": "node scripts/fetch-complex-profiles.mjs",
     "test": "node --test scripts/*.test.mjs",
     "build": "node scripts/prepare-pages.mjs"
   },

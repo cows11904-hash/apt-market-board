@@ -1,5 +1,6 @@
 import { AREA_RANGES, isDay } from './market-data.js';
 import { richgoComplexUrl } from './richgo-quotes.js';
+import { profileMatcher } from './complex-profiles.js';
 
 export function complexKey(code, dong, name) {
   return JSON.stringify([code, dong, name]);
@@ -10,13 +11,15 @@ export function complexCatalogPath(hash) {
   return `data/complexes/${hash}.json`;
 }
 
-export function buildComplexCatalog(tradesByDistrict, quotesByDistrict) {
+export function buildComplexCatalog(tradesByDistrict, quotesByDistrict = new Map(), profiles = []) {
   const entries = new Map();
+  const matchProfile = profileMatcher(profiles);
+  const usedProfiles = new Set();
   function entry(code, row) {
     const key = complexKey(code, row.dong, row.aptName);
     if (!entries.has(key)) entries.set(key, {
       key, districtCode: code, aptName: row.aptName, dong: row.dong,
-      tradeCount: 0, lastTradeDate: null, aptId: null, areaRanges: [],
+      tradeCount: 0, lastTradeDate: null, aptId: null, areaRanges: [], profile: null,
     });
     return entries.get(key);
   }
@@ -26,7 +29,15 @@ export function buildComplexCatalog(tradesByDistrict, quotesByDistrict) {
       apartment.tradeCount++;
       if (!apartment.lastTradeDate || row.dealDate > apartment.lastTradeDate) apartment.lastTradeDate = row.dealDate;
       apartment.areaRanges.push([row.areaM2, row.areaM2]);
+      const profile = matchProfile(code, row);
+      if (profile) { apartment.profile = profile; usedProfiles.add(profile.id); }
     }
+  }
+  for (const profile of profiles) {
+    if (usedProfiles.has(profile.id)) continue;
+    if (entries.has(complexKey(profile.districtCode, profile.dong, profile.name))) continue;
+    const apartment = entry(profile.districtCode, { aptName: profile.name, dong: profile.dong });
+    apartment.profile = profile;
   }
   for (const [code, quotes] of quotesByDistrict) {
     for (const row of quotes) {
@@ -51,7 +62,7 @@ export function validateComplexCatalog(data, regionCodes) {
         || seen.has(row.key) || !Number.isSafeInteger(row.tradeCount) || row.tradeCount < 0
         || (row.lastTradeDate !== null && !isDay(row.lastTradeDate))
         || (row.tradeCount > 0 && row.lastTradeDate === null)
-        || !Array.isArray(row.areaRanges) || !row.areaRanges.length
+        || !Array.isArray(row.areaRanges) || (!row.areaRanges.length && !row.profile)
         || row.areaRanges.some(range => !Array.isArray(range) || range.length !== 2
           || !range.every(value => Number.isFinite(value) && value > 0) || range[0] > range[1])) {
       throw new Error('단지 이름, 지역 또는 면적을 확인해야 합니다.');
@@ -71,10 +82,10 @@ export function searchComplexes(apartments, { district = '', query = '', area = 
     const neighborhood = apartment.dong.replace(/[동읍면]$/, '');
     const shortName = apartment.aptName.startsWith(apartment.dong)
       ? neighborhood + apartment.aptName.slice(apartment.dong.length) : apartment.aptName;
-    const names = [apartment.aptName, shortName, apartment.dong + apartment.aptName, neighborhood + apartment.aptName,
+    const names = [apartment.aptName, apartment.profile?.name ?? '', shortName, apartment.dong + apartment.aptName, neighborhood + apartment.aptName,
       (districtNames.get(apartment.districtCode) ?? '') + apartment.aptName].map(searchKey);
     return (!district || apartment.districtCode === district)
-      && apartment.areaRanges.some(([low, high]) => low <= max && high >= min)
+      && (area === 'all' || !area || apartment.areaRanges.some(([low, high]) => low <= max && high >= min))
       && terms.every(term => names.some(name => name.includes(term)));
   });
 }

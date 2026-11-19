@@ -2,115 +2,101 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; script-src 'self'; script-src-attr 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self'; font-src 'self'; object-src 'none'; frame-src 'none'; form-action 'none'; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#142e32">
-  <meta name="referrer" content="no-referrer">
-  <meta name="description" content="서울 25개 자치구의 아파트 매매 실거래가를 계약일, 전용면적, 출처와 확인일로 살펴보세요.">
-  <title>시세나침반 | 아파트 매매 실거래가</title>
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="서울 아파트를 한 번에 검색하고 세대수, 주차, 사용승인일, 지도와 공식 매매 실거래가를 함께 확인하세요.">
+  <title>시세나침반 | 아파트 검색 · 실거래</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
+  <script defer src="./vendor/leaflet/leaflet.js"></script>
   <script type="module" src="./app.js"></script>
 </head>
-<body>
+<body class="unified-page">
   <a class="skip" href="#main">본문으로 이동</a>
-  <header class="topbar">
-    <div class="shell topbar-in">
-      <a class="brand" href="./" aria-label="시세나침반 홈"><span class="compass" aria-hidden="true"></span>시세나침반</a>
-      <nav class="top-actions" aria-label="서비스 메뉴">
-        <a class="top-link top-link-feature" id="quotes-link" href="./quotes.html">단지 검색 · 지도</a>
-        <a class="top-link" href="#data-guide">데이터 안내 <span aria-hidden="true">↓</span></a>
-      </nav>
-    </div>
-  </header>
+  <header class="topbar"><div class="shell topbar-in">
+    <a class="brand" href="./" aria-label="시세나침반 홈"><span class="compass" aria-hidden="true"></span>시세나침반</a>
+    <nav aria-label="서비스 메뉴"><a class="top-link" href="#data-guide">데이터 안내</a></nav>
+  </div></header>
   <main id="main">
-    <section class="hero" aria-labelledby="page-title">
-      <div class="shell hero-in">
-        <div>
-          <p class="hero-region" id="hero-region">서울특별시 · 25개 자치구</p>
-          <h1 id="page-title">아파트 매매 실거래가</h1>
-          <p class="hero-copy" id="hero-copy">단지와 전용면적으로 찾는 국토교통부 신고 가격</p>
+    <section class="hero" aria-labelledby="page-title"><div class="shell hero-in">
+      <div><p class="hero-region">서울특별시 · 25개 자치구</p><h1 id="page-title">아파트 검색 · 실거래</h1>
+        <p class="hero-copy">단지 정보부터 위치, 실제 거래가격까지 한곳에서 확인하세요.</p></div>
+      <div class="data-card"><div class="data-status" id="data-status" role="status"><span aria-hidden="true"></span><strong>데이터 확인 중</strong></div>
+        <p id="data-timestamp">마지막 성공 수집일 확인 중</p>
+        <a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">국토교통부 실거래 자료</a></div>
+    </div></section>
+    <div class="shell workspace unified-workspace">
+      <form class="filters" id="filters" role="search" aria-label="아파트 통합 검색" novalidate>
+        <div class="filter-heading"><h2>아파트 찾기</h2><button type="button" id="reset" class="text-button">초기화</button></div>
+        <div class="filters-grid unified-filters-grid">
+          <label>시·군·구 <select id="district" disabled><option value="">서울 전체</option></select></label>
+          <label class="unified-query">단지명 · 동 이름 <input id="search" type="search" placeholder="예: 홍은벽산, 응암동" autocomplete="off" maxlength="120"></label>
+          <label>전용면적 <select id="area"><option value="all">전체 면적</option><option value="59">57~61㎡</option><option value="74">72~76㎡</option><option value="84">80~85㎡</option></select></label>
+          <label>실거래 가격 상한 <span class="input-unit"><input id="budget" type="number" inputmode="decimal" step="0.0001" min="0.0001" placeholder="없음" aria-label="실거래 가격 상한 (억 원)" aria-describedby="budget-error"><span aria-hidden="true">억 원</span></span></label>
         </div>
-        <div class="data-card" id="trade-status">
-          <div class="data-status" id="data-status" role="status"><span aria-hidden="true"></span><strong>데이터 확인 중</strong></div>
-          <p id="data-timestamp">마지막 성공 수집일 확인 중</p>
-          <a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">국토교통부 데이터 출처 <span aria-hidden="true">↗</span></a>
+        <details class="advanced-filters" id="advanced-filters"><summary>상세 조건 <span id="advanced-summary"></span></summary><div class="advanced-grid">
+          <label>계약월 <select id="month"><option value="">전체 수집기간</option></select></label>
+          <label>거래 유형 <select id="kind"><option value="">전체 유형</option><option value="중개거래">중개거래</option><option value="직거래">직거래</option><option value="구분 미확인">구분 미확인</option></select></label>
+        </div></details>
+        <p class="field-error" id="budget-error" hidden>가격 상한을 억 원 단위로 입력해 주세요. 예: 8.9 = 8억 9천만 원</p>
+      </form>
+      <section class="selected-complex quote-card" id="selected-complex" aria-labelledby="complex-name" hidden>
+        <div class="quote-card-heading"><div><p class="detail-address" id="complex-address"></p><h2 id="complex-name" tabindex="-1"></h2></div>
+          <button type="button" class="button button-outline" id="clear-complex">단지 선택 해제</button></div>
+        <dl class="profile-grid" id="profile-grid"></dl>
+        <p class="profile-note" id="profile-note"></p>
+        <p class="profile-evidence" id="profile-evidence" hidden><a href="https://data.seoul.go.kr/dataList/OA-15818/S/1/datasetView.do" target="_blank" rel="noopener noreferrer">서울특별시 공동주택 아파트 정보</a><span id="profile-checked-at"></span></p>
+      </section>
+      <p class="notice freshness-note" id="freshness-note" hidden></p>
+      <section class="metrics" id="metrics" aria-label="검색 조건에 해당하는 실거래 요약" hidden>
+        <div><span>조회 거래</span><strong id="count">—</strong></div>
+        <div><span>조회 거래 중위가격</span><strong id="median">—</strong><small>선택한 면적 · 기간 · 거래 유형 기준</small></div>
+        <div><span>최신 계약일</span><strong id="last-contract">—</strong></div>
+      </section>
+      <div class="view-tabs tabs" role="tablist" aria-label="검색 결과 표시 방식">
+        <button type="button" role="tab" class="tab" id="tab-trades" aria-selected="true" aria-controls="trades-panel">실거래 내역</button>
+        <button type="button" role="tab" class="tab" id="tab-complexes" aria-selected="false" aria-controls="complexes-panel" tabindex="-1">단지 · 지도</button>
+        <span class="shared-filter-note">검색 조건이 함께 적용됩니다</span>
+      </div>
+      <section class="results" id="trades-panel" role="tabpanel" aria-labelledby="tab-trades" tabindex="0" aria-busy="true">
+        <div class="results-heading"><div><h2 id="results-title">실거래 내역</h2><p id="results-subtitle" aria-live="polite">자료를 불러오는 중입니다.</p></div>
+          <div class="result-actions"><a class="button button-outline" href="https://rt.molit.go.kr/pt/xls/xls.do" target="_blank" rel="noopener noreferrer">공식 원자료</a><button type="button" class="button" id="csv" hidden>CSV 다운로드</button></div>
         </div>
-      </div>
-    </section>
-    <div class="shell workspace">
-      <div class="tabs" id="price-tabs" role="tablist" aria-label="자료 종류" hidden>
-        <button type="button" role="tab" class="tab" id="tab-trades" aria-selected="true" aria-controls="results-panel">실거래가</button>
-        <button type="button" role="tab" class="tab" id="tab-listings" aria-selected="false" aria-controls="results-panel" tabindex="-1">매물 호가</button>
-      </div>
-      <div id="results-panel">
-        <form class="filters" id="filters" aria-label="아파트 검색 필터" novalidate>
-          <div class="filter-heading"><h2>검색 조건</h2><button type="button" id="reset" class="text-button">초기화</button></div>
-          <div class="filters-grid">
-            <label>시·도 <select id="city" disabled><option>서울특별시</option></select></label>
-            <label>시·군·구 <select id="district" disabled><option value="">지역 확인 중</option></select></label>
-            <label>전용면적 <select id="area"><option value="all">전체 면적</option><option value="59">57~61㎡</option><option value="74">72~76㎡</option><option value="84">80~85㎡</option></select></label>
-            <label>단지명 <input id="search" type="search" placeholder="단지명 입력" autocomplete="off" maxlength="100"></label>
-            <label>가격 상한 <span class="input-unit"><input id="budget" type="number" inputmode="decimal" step="0.0001" min="0.0001" placeholder="없음" aria-label="가격 상한 (억 원)" aria-describedby="budget-error"><span aria-hidden="true">억 원</span></span></label>
-            <label id="month-label">계약월 <select id="month" disabled><option value="">전체 기간</option></select></label>
-            <label id="kind-label">거래 유형 <select id="kind"><option value="">전체 유형</option><option value="중개거래">중개거래</option><option value="직거래">직거래</option><option value="구분 미확인">구분 미확인</option></select></label>
-          </div>
-          <p class="field-error" id="budget-error" hidden>가격 상한을 억 원 단위로 입력해 주세요. 예를 들어 10.5는 10억 5천만 원입니다.</p>
-        </form>
-        <section class="metrics" id="metrics" aria-label="조회 요약" hidden>
-          <div><span>조회 거래</span><strong id="count">—</strong></div>
-          <div><span>조회 거래 중위가격</span><strong id="median">—</strong><small id="median-source" hidden></small></div>
-          <div><span>최신 계약일</span><strong id="last-contract">—</strong></div>
-        </section>
-        <section class="results" aria-labelledby="results-title" aria-busy="true">
-          <div class="results-heading">
-            <div>
-              <h2 id="results-title">실거래 내역</h2>
-              <p id="results-subtitle" aria-live="polite">자료를 불러오는 중입니다.</p>
-            </div>
-            <div class="result-actions">
-              <a class="button button-outline" id="source-link" href="https://rt.molit.go.kr/pt/xls/xls.do" target="_blank" rel="noopener noreferrer">공식 원자료 <span aria-hidden="true">↗</span></a>
-              <div class="result-actions" id="listing-links" hidden>
-                <a class="button button-outline" href="https://land.naver.com/" target="_blank" rel="noopener noreferrer">네이버 부동산에서 보기 <span aria-hidden="true">↗</span></a>
-                <a class="button button-outline" id="richgo-link" href="https://m.richgo.ai/realty/apt-hub/서울" target="_blank" rel="noopener noreferrer"><span id="richgo-label">리치고에서 보기</span><span aria-hidden="true">↗</span></a>
-              </div>
-              <button type="button" class="button" id="csv" hidden>CSV 다운로드</button>
-            </div>
-          </div>
-          <div id="freshness-note" class="notice" hidden></div>
-          <div class="table-wrap" id="table-wrap" hidden>
-            <table role="table">
-              <caption class="sr-only" id="table-caption">아파트 실거래 내역</caption>
-              <thead id="table-head" role="rowgroup"></thead>
-              <tbody id="table-body" role="rowgroup"></tbody>
-            </table>
-          </div>
-          <div class="empty" id="empty">
-            <span class="empty-mark" aria-hidden="true">⌕</span>
-            <h3 id="empty-title">자료를 확인하고 있습니다</h3>
-            <p id="empty-message"></p>
-            <button type="button" class="button button-outline" id="retry" hidden>다시 불러오기</button>
-          </div>
-          <nav class="pagination" id="pagination" aria-label="조회 결과 페이지" hidden>
-            <button type="button" id="prev" class="button button-outline">이전</button>
-            <span id="page-label" aria-live="polite"></span>
-            <button type="button" id="next" class="button button-outline">다음</button>
-          </nav>
-        </section>
-      </div>
-      <details class="data-guide" id="data-guide">
-        <summary>데이터 범위와 해석</summary>
-        <div class="guide-body">
-          <p><strong>수집 범위</strong> 현재 월과 직전 3개월의 아파트 매매 신고를 계약일 기준으로 조회합니다. 해제 신고 건을 제외하고 직거래는 거래 유형으로 표시합니다. 증여·상속·무상 이전은 매매 신고 범위에서 제외됩니다.</p>
-          <p><strong>신고 시차</strong> 매매는 계약일부터 30일 이내에 신고합니다. 늦게 들어온 신고와 정정·해제가 반영되면 과거 계약월의 건수도 달라질 수 있습니다.</p>
-          <p><strong>가격 비교</strong> 중위가격은 선택한 검색 조건에 해당하는 신고의 가운데 값입니다. 전용면적과 층, 거래 유형을 함께 확인하세요. 공개 자료로는 거래 당사자의 관계를 확인할 수 없습니다.</p>
-          <p id="listing-guide" hidden><strong>호가 확인</strong> 게시 권한을 확보한 출처의 유효 매물을 마지막 확인일과 함께 표시합니다. 같은 세대가 여러 매물로 등록될 수 있고, 가격 변경이나 철회는 다음 수집 때 반영됩니다.</p>
-          <a href="https://rt.molit.go.kr/pt/bbs/faqList.do?mobileAt=&amp;qnaProcessSttusCode=1" target="_blank" rel="noopener noreferrer">국토교통부 실거래가 FAQ ↗</a>
+        <div class="table-wrap" id="table-wrap" hidden><table role="table"><caption class="sr-only">검색 조건에 맞는 아파트 매매 실거래 내역</caption>
+          <thead role="rowgroup"><tr role="row"><th scope="col">아파트</th><th scope="col">전용면적 · 층</th><th scope="col">계약일</th><th scope="col">거래 유형</th><th scope="col">실거래가</th><th scope="col">출처 · 확인일</th></tr></thead>
+          <tbody id="table-body" role="rowgroup"></tbody></table></div>
+        <div class="empty" id="empty"><h3 id="empty-title">자료를 확인하고 있습니다</h3><p id="empty-message"></p><button type="button" class="button button-outline" id="retry" hidden>다시 불러오기</button></div>
+        <nav class="pagination" id="pagination" aria-label="거래 내역 페이지" hidden><button type="button" id="prev" class="button button-outline">이전</button><span id="page-label" aria-live="polite"></span><button type="button" id="next" class="button button-outline">다음</button></nav>
+      </section>
+      <section id="complexes-panel" role="tabpanel" aria-labelledby="tab-complexes" tabindex="0" hidden>
+        <div class="quote-dashboard">
+          <section class="quote-card complex-results-panel" aria-labelledby="complex-results-heading">
+            <div class="quote-card-heading"><div><h2 id="complex-results-heading">단지 검색 결과</h2><p id="complex-results-count" role="status">단지 목록을 불러오는 중입니다.</p></div></div>
+            <div id="complex-results" class="complex-results" aria-busy="true"></div>
+            <p id="complex-results-empty" class="complex-empty" hidden></p>
+            <button id="complex-more" type="button" class="button button-outline more-results" hidden>단지 더 보기</button>
+            <p id="complex-catalog-note" class="catalog-note"></p>
+          </section>
+          <aside class="quote-card map-card" aria-labelledby="map-heading"><div class="quote-card-heading"><div><h2 id="map-heading">지도</h2><p id="map-selection">서울특별시</p></div><a class="button button-outline" id="map-kakao-link" href="https://map.kakao.com/link/search/서울특별시" target="_blank" rel="noopener noreferrer">카카오맵에서 보기</a></div>
+            <div class="quote-map"><div id="map-raster" class="quote-map-canvas" role="region" aria-label="선택한 지역 지도" hidden></div><div id="map-kakao" class="quote-map-canvas" role="region" aria-label="선택한 지역 카카오 지도" hidden></div><p id="map-placeholder" class="map-placeholder">지도를 불러오는 중입니다.</p></div>
+            <p class="map-hint" id="map-hint" role="status"></p><p class="map-attribution">지역 범위: <a href="https://sgis.kostat.go.kr/" target="_blank" rel="noopener noreferrer">SGIS</a> · <a href="https://github.com/vuski/admdongkor" target="_blank" rel="noopener noreferrer">vuski/admdongkor</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a><br>단지 좌표: 서울특별시</p>
+          </aside>
         </div>
-      </details>
+      </section>
+      <details class="data-guide" id="data-guide"><summary>데이터 범위와 해석</summary><div class="guide-body">
+        <p><strong>실거래</strong> 국토교통부의 현재 월과 직전 3개월 매매 신고를 계약일 기준으로 조회합니다. 해제 신고를 제외하며 증여·상속·무상 이전은 매매 신고 범위에 포함되지 않습니다. 신고·정정 시차로 건수가 달라질 수 있습니다.</p>
+        <p><strong>단지 기본 정보</strong> 서울특별시 공동주택 아파트 정보(공공누리 제1유형)를 활용합니다. 지역·법정동·단지명을 대조해 일치하는 단지에만 연결합니다. 이름이나 구분이 불명확하면 세대수 등을 추정하지 않고 미확인으로 표시합니다.</p>
+        <p><strong>단지 규모와 주차</strong> 세대수·동수는 등록된 단지 전체 기준입니다. 주차대수와 세대당 주차는 제공 자료에 따른 값으로, 공란·0·미등록 값은 미확인으로 처리합니다. 주차 여유나 실제 이용 가능 대수를 뜻하지 않습니다.</p>
+        <p><strong>검색 범위</strong> 공식 기본 정보에 등록된 단지는 수집기간 내 거래가 없어도 전체 면적에서 검색할 수 있습니다. 면적 조건은 수집기간 내 실제 신고 면적을 기준으로 적용합니다. 실거래 가격 상한·계약월·거래 유형을 지정하면 해당 조건의 신고가 있는 단지만 표시합니다.</p>
+        <p><strong>가격 비교</strong> 중위가격은 현재 검색 조건에 해당하는 신고의 가운데 값입니다. 거래 당사자 관계는 공개 자료로 확인할 수 없습니다.</p>
+        <p><a href="https://data.seoul.go.kr/dataList/OA-15818/S/1/datasetView.do" target="_blank" rel="noopener noreferrer">서울시 단지 정보 원자료</a> · <a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">국토교통부 실거래 원자료</a></p>
+      </div></details>
     </div>
   </main>
-  <footer><div class="shell footer-in"><span>시세나침반</span><a href="https://www.data.go.kr/data/15126468/openapi.do" target="_blank" rel="noopener noreferrer">공공데이터포털 ↗</a></div></footer>
+  <footer><div class="shell footer-in"><span>시세나침반</span><span>실거래 · 단지 정보 · 지도</span></div></footer>
   <noscript><p class="shell notice">검색을 이용하려면 브라우저의 JavaScript를 켜 주세요.</p></noscript>
 </body>
 </html>

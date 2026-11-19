@@ -224,7 +224,7 @@ function csvCell(value) {
 export function tradesCsv(rows, districtName) {
   const table = [['시군구', '아파트', '법정동', '아파트동', '전용면적(㎡)', '층', '계약일', '가격(원)', '거래 유형', '출처', '출처 URL', '확인 시각(KST)']];
   for (const row of rows) {
-    table.push([districtName, row.aptName, row.dong, row.building, row.areaM2, row.floor, row.dealDate, row.priceWon,
+    table.push([typeof districtName === 'function' ? districtName(row) : districtName, row.aptName, row.dong, row.building, row.areaM2, row.floor, row.dealDate, row.priceWon,
       row.transactionType, MOLIT_SOURCE, MOLIT_SOURCE_URL, seoulDateTime(row.checkedAt)]);
   }
   return '\uFEFF' + table.map(row => row.map(csvCell).join(',')).join('\r\n') + '\r\n';

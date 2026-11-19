@@ -8,13 +8,13 @@ const directives = policy => new Map(policy.split('; ').map(part => {
   return [name, values];
 }));
 
-test('두 페이지의 CSP는 자원 로드 전에 적용되고 기본 스크립트를 자체 출처로 제한한다', async () => {
-  for (const [name, map] of [['index.html', false], ['quotes.html', true]]) {
+test('통합 화면과 이전 주소의 CSP가 자원 로드 전에 적용된다', async () => {
+  for (const [name, map] of [['index.html', true], ['quotes.html', false]]) {
     const html = await readFile(new URL('../' + name, import.meta.url), 'utf8');
     const match = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)">/);
     assert.ok(match);
     assert.ok(match.index < html.indexOf('<script'));
-    assert.ok(match.index < html.indexOf('<link'));
+    if (html.includes('<link')) assert.ok(match.index < html.indexOf('<link'));
     assert.equal(match[1], pageSecurityPolicy({ map }));
     const policy = directives(match[1]);
     assert.deepEqual(policy.get('script-src'), ["'self'"]);
