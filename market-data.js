@@ -215,7 +215,9 @@ export function activeListings(rows, code, now = new Date()) {
 
 function csvCell(value) {
   const text = String(value ?? '');
-  const safeText = typeof value === 'string' && /^\s*[=+@\-\t\r\n]/.test(text) ? `'${text}` : text;
+  // Normalize only for detection so full-width formula prefixes keep their original spelling.
+  const formula = typeof value === 'string' && /^\s*[=+@\-\t\r\n]/.test(text.normalize('NFKC'));
+  const safeText = formula ? `\t${text}` : text;
   return `"${safeText.replaceAll('"', '""')}"`;
 }
 

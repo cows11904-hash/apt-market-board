@@ -37,11 +37,22 @@ test('조회 CSV는 동일 계약을 보존하고 가격 원 단위와 출처, �
   const lines = tradesCsv([row, row], '종로구').trimEnd().split('\r\n');
   assert.equal(lines.length, 3);
   assert.equal(lines[1], lines[2]);
-  assert.match(lines[1], /'=fixture,""단지""/);
+  assert.match(lines[1], /\t=fixture,""단지""/);
   assert.match(lines[1], /1000010000/);
   assert.match(lines[1], /data\.go\.kr/);
   assert.match(lines[1], /2026-01-13 00:00 KST/);
   assert.equal(seoulDay(row.checkedAt), '2026-01-13');
+});
+
+test('CSV는 전각 문자와 공백 뒤 수식도 텍스트로 내보내고 숫자 필드를 유지한다', () => {
+  for (const name of ['=1+1', '+1', '-1', '@SUM(A1)', '＝1+1', '＋1', '－1', '＠SUM(A1)', '  ＝1+1', '\t=1+1', '\r=1+1', '\n=1+1']) {
+    const csv = tradesCsv([{ ...common, aptName: name, areaM2: 84.25, floor: -1 }], '종로구');
+    assert.ok(csv.includes(`"\t${name}"`));
+    assert.ok(csv.includes('"84.25","-1"'));
+  }
+  const csv = tradesCsv([{ ...common, aptName: '정상,"단지"', areaM2: 84.25 }], '종로구');
+  assert.ok(csv.includes('"정상,""단지"""'));
+  assert.ok(!csv.includes('\t정상'));
 });
 
 test('법정동 접미사를 생략해도 같은 단지가 검색된다', () => {

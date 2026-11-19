@@ -48,3 +48,11 @@ python -m http.server 8000 --directory dist
 ## 전국 확장
 
 `data/regions.json`에 시·도 코드와 그 아래 5자리 법정 시·군·구 코드 목록을 추가하면 지역 선택과 API 조회에 반영됩니다. 지역별 JSON은 선택한 구역만 불러옵니다. 여러 시·도를 운영하기 전에는 전체 호출량, API 쿼터, Actions 실행시간과 스냅샷 크기를 확인합니다.
+
+## 브라우저 보안
+
+두 화면은 자원 로드 전에 HTML 메타 태그로 CSP를 적용합니다. 스크립트와 데이터 요청을 같은 출처로 제한하고 인라인 이벤트, 외부 프레임, 플러그인과 폼 전송을 차단합니다. 지도 화면에서는 OpenStreetMap 타일 이미지와 지도 배치에 필요한 인라인 스타일을 허용합니다. 카카오 웹 키가 설정된 빌드는 지도 화면에서 공식 SDK와 카카오 리소스 출처도 허용합니다.
+
+GitHub Pages는 응답 헤더를 직접 설정하는 기능을 제공하지 않아, 메타 태그에서 지원되지 않는 `frame-ancestors`, `X-Frame-Options`, `X-Content-Type-Options`, `Permissions-Policy`는 호스팅 계층에서 추가해야 합니다. 현재 공개 페이지의 외부 프레임 삽입 차단은 완료되지 않았습니다. [GitHub 안내](https://github.com/orgs/community/discussions/54257) · [MDN frame-ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-ancestors)
+
+CSV 내보내기는 전각 문자를 포함한 수식 시작 문자열에 탭을 붙여 스프레드시트의 수식 해석을 완화합니다. 해당 문자열의 CSV 값에는 이 탭이 포함됩니다. 가격·면적·층의 숫자형 필드는 그대로 유지합니다. 스프레드시트에서 재저장하거나 다른 프로그램으로 가져오는 동작은 프로그램별로 확인해야 합니다. [OWASP CSV Injection](https://community.owasp.org/attacks/CSV_Injection)

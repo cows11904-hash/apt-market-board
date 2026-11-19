@@ -7,6 +7,7 @@ import { quoteDistrictPath, validateQuoteManifest } from '../richgo-quotes.js';
 import { validMapBounds } from '../quote-map.js';
 import { prepareListings } from './listings-feed.mjs';
 import { prepareRichgoQuotes } from './richgo-quotes-feed.mjs';
+import { pageSecurityPolicy } from './page-security.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const output = join(root, 'dist');
@@ -82,7 +83,9 @@ const quotes = (await readFile(join(root, 'quotes.js'), 'utf8'))
   .replace('./quote-map.js', `./${mapModule}`);
 const quotesName = await writeAsset('quotes.js', quotes);
 for (const [page, script, compiled] of [['index.html', 'app.js', appName], ['quotes.html', 'quotes.js', quotesName]]) {
+  const policy = pageSecurityPolicy({ map: page === 'quotes.html', kakao: Boolean(kakaoJavaScriptKey) });
   const html = (await readFile(join(root, page), 'utf8'))
+    .replace(/(<meta http-equiv="Content-Security-Policy" content=")[^"]*(">)/, `$1${policy}$2`)
     .replace('./styles.css', `./${styles}`)
     .replaceAll('./vendor/leaflet/', `./${leafletPath}/`)
     .replace(`./${script}`, `./${compiled}`);
