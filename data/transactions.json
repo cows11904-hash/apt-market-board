@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "state": "ok",
-  "lastAttemptAt": "2026-11-19T06:16:53.122Z",
-  "updatedAt": "2026-11-19T06:16:53.122Z",
-  "revision": "20261119T061653122Z",
+  "lastAttemptAt": "2026-11-20T02:19:13.524Z",
+  "updatedAt": "2026-11-20T02:19:13.524Z",
+  "revision": "20261120T021913524Z",
   "source": "국토교통부 아파트 매매 실거래가 상세 자료",
   "sourceUrl": "https://www.data.go.kr/data/15126468/openapi.do",
   "months": [
@@ -14,7 +14,7 @@
   ],
   "districts": {
     "11110": {
-      "count": 81,
+      "count": 82,
       "months": {
         "202608": {
           "raw": 24,
@@ -35,8 +35,8 @@
           "nonSale": 0
         },
         "202611": {
-          "raw": 2,
-          "included": 2,
+          "raw": 3,
+          "included": 3,
           "canceled": 0,
           "nonSale": 0
         }
@@ -46,8 +46,8 @@
       "count": 127,
       "months": {
         "202608": {
-          "raw": 34,
-          "included": 31,
+          "raw": 33,
+          "included": 30,
           "canceled": 3,
           "nonSale": 0
         },
@@ -58,8 +58,8 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 45,
-          "included": 45,
+          "raw": 46,
+          "included": 46,
           "canceled": 0,
           "nonSale": 0
         },
@@ -72,7 +72,7 @@
       }
     },
     "11170": {
-      "count": 143,
+      "count": 149,
       "months": {
         "202608": {
           "raw": 49,
@@ -87,21 +87,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 50,
-          "included": 48,
+          "raw": 53,
+          "included": 51,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 11,
-          "included": 11,
+          "raw": 14,
+          "included": 14,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11200": {
-      "count": 205,
+      "count": 210,
       "months": {
         "202608": {
           "raw": 57,
@@ -122,19 +122,19 @@
           "nonSale": 0
         },
         "202611": {
-          "raw": 19,
-          "included": 19,
+          "raw": 24,
+          "included": 24,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11215": {
-      "count": 149,
+      "count": 151,
       "months": {
         "202608": {
-          "raw": 53,
-          "included": 49,
+          "raw": 52,
+          "included": 48,
           "canceled": 4,
           "nonSale": 0
         },
@@ -145,26 +145,26 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 47,
-          "included": 47,
+          "raw": 49,
+          "included": 49,
           "canceled": 0,
           "nonSale": 0
         },
         "202611": {
-          "raw": 7,
-          "included": 7,
+          "raw": 8,
+          "included": 8,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11230": {
-      "count": 764,
+      "count": 763,
       "months": {
         "202608": {
           "raw": 143,
-          "included": 139,
-          "canceled": 4,
+          "included": 138,
+          "canceled": 5,
           "nonSale": 0
         },
         "202609": {
@@ -174,9 +174,9 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 470,
+          "raw": 471,
           "included": 465,
-          "canceled": 5,
+          "canceled": 6,
           "nonSale": 0
         },
         "202611": {
@@ -188,7 +188,7 @@
       }
     },
     "11260": {
-      "count": 547,
+      "count": 550,
       "months": {
         "202608": {
           "raw": 203,
@@ -203,21 +203,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 150,
-          "included": 149,
-          "canceled": 1,
+          "raw": 151,
+          "included": 148,
+          "canceled": 3,
           "nonSale": 0
         },
         "202611": {
-          "raw": 58,
-          "included": 58,
+          "raw": 62,
+          "included": 62,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11290": {
-      "count": 596,
+      "count": 604,
       "months": {
         "202608": {
           "raw": 181,
@@ -232,21 +232,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 169,
-          "included": 166,
+          "raw": 170,
+          "included": 167,
           "canceled": 3,
           "nonSale": 0
         },
         "202611": {
-          "raw": 74,
-          "included": 74,
+          "raw": 81,
+          "included": 81,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11305": {
-      "count": 293,
+      "count": 297,
       "months": {
         "202608": {
           "raw": 75,
@@ -261,21 +261,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 111,
-          "included": 110,
+          "raw": 112,
+          "included": 111,
           "canceled": 1,
           "nonSale": 0
         },
         "202611": {
-          "raw": 30,
-          "included": 30,
+          "raw": 33,
+          "included": 33,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11320": {
-      "count": 731,
+      "count": 741,
       "months": {
         "202608": {
           "raw": 226,
@@ -284,27 +284,27 @@
           "nonSale": 0
         },
         "202609": {
-          "raw": 220,
-          "included": 215,
+          "raw": 219,
+          "included": 214,
           "canceled": 5,
           "nonSale": 0
         },
         "202610": {
-          "raw": 248,
-          "included": 245,
+          "raw": 250,
+          "included": 247,
           "canceled": 3,
           "nonSale": 0
         },
         "202611": {
-          "raw": 57,
-          "included": 55,
-          "canceled": 2,
+          "raw": 67,
+          "included": 64,
+          "canceled": 3,
           "nonSale": 0
         }
       }
     },
     "11350": {
-      "count": 1490,
+      "count": 1524,
       "months": {
         "202608": {
           "raw": 548,
@@ -319,21 +319,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 473,
-          "included": 468,
-          "canceled": 5,
+          "raw": 479,
+          "included": 473,
+          "canceled": 6,
           "nonSale": 0
         },
         "202611": {
-          "raw": 73,
-          "included": 72,
+          "raw": 102,
+          "included": 101,
           "canceled": 1,
           "nonSale": 0
         }
       }
     },
     "11380": {
-      "count": 667,
+      "count": 674,
       "months": {
         "202608": {
           "raw": 219,
@@ -348,21 +348,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 206,
-          "included": 202,
+          "raw": 208,
+          "included": 204,
           "canceled": 4,
           "nonSale": 0
         },
         "202611": {
-          "raw": 49,
-          "included": 49,
+          "raw": 54,
+          "included": 54,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11410": {
-      "count": 415,
+      "count": 423,
       "months": {
         "202608": {
           "raw": 126,
@@ -377,21 +377,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 149,
-          "included": 147,
+          "raw": 150,
+          "included": 148,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 40,
-          "included": 40,
+          "raw": 47,
+          "included": 47,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11440": {
-      "count": 330,
+      "count": 335,
       "months": {
         "202608": {
           "raw": 123,
@@ -406,21 +406,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 116,
-          "included": 114,
+          "raw": 119,
+          "included": 117,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 15,
-          "included": 15,
+          "raw": 17,
+          "included": 17,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11470": {
-      "count": 400,
+      "count": 410,
       "months": {
         "202608": {
           "raw": 129,
@@ -429,27 +429,27 @@
           "nonSale": 0
         },
         "202609": {
-          "raw": 101,
+          "raw": 102,
           "included": 98,
-          "canceled": 3,
+          "canceled": 4,
           "nonSale": 0
         },
         "202610": {
-          "raw": 136,
-          "included": 131,
+          "raw": 142,
+          "included": 137,
           "canceled": 5,
           "nonSale": 0
         },
         "202611": {
-          "raw": 46,
-          "included": 46,
+          "raw": 50,
+          "included": 50,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11500": {
-      "count": 851,
+      "count": 869,
       "months": {
         "202608": {
           "raw": 273,
@@ -458,27 +458,27 @@
           "nonSale": 0
         },
         "202609": {
-          "raw": 261,
-          "included": 257,
+          "raw": 262,
+          "included": 258,
           "canceled": 4,
           "nonSale": 0
         },
         "202610": {
-          "raw": 270,
-          "included": 257,
+          "raw": 272,
+          "included": 259,
           "canceled": 13,
           "nonSale": 0
         },
         "202611": {
-          "raw": 74,
-          "included": 74,
+          "raw": 89,
+          "included": 89,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11530": {
-      "count": 682,
+      "count": 692,
       "months": {
         "202608": {
           "raw": 210,
@@ -493,21 +493,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 238,
-          "included": 236,
+          "raw": 239,
+          "included": 237,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 34,
-          "included": 34,
+          "raw": 43,
+          "included": 43,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11545": {
-      "count": 324,
+      "count": 330,
       "months": {
         "202608": {
           "raw": 109,
@@ -522,21 +522,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 106,
-          "included": 104,
+          "raw": 109,
+          "included": 107,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 28,
-          "included": 28,
+          "raw": 31,
+          "included": 31,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11560": {
-      "count": 438,
+      "count": 446,
       "months": {
         "202608": {
           "raw": 151,
@@ -551,25 +551,25 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 139,
-          "included": 137,
+          "raw": 142,
+          "included": 140,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 33,
-          "included": 32,
+          "raw": 38,
+          "included": 37,
           "canceled": 1,
           "nonSale": 0
         }
       }
     },
     "11590": {
-      "count": 333,
+      "count": 332,
       "months": {
         "202608": {
-          "raw": 127,
-          "included": 124,
+          "raw": 126,
+          "included": 123,
           "canceled": 3,
           "nonSale": 0
         },
@@ -594,7 +594,7 @@
       }
     },
     "11620": {
-      "count": 437,
+      "count": 440,
       "months": {
         "202608": {
           "raw": 121,
@@ -609,21 +609,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 170,
-          "included": 161,
-          "canceled": 9,
+          "raw": 172,
+          "included": 162,
+          "canceled": 10,
           "nonSale": 0
         },
         "202611": {
-          "raw": 49,
-          "included": 46,
+          "raw": 51,
+          "included": 48,
           "canceled": 3,
           "nonSale": 0
         }
       }
     },
     "11650": {
-      "count": 335,
+      "count": 338,
       "months": {
         "202608": {
           "raw": 90,
@@ -644,15 +644,15 @@
           "nonSale": 0
         },
         "202611": {
-          "raw": 23,
-          "included": 23,
+          "raw": 26,
+          "included": 26,
           "canceled": 0,
           "nonSale": 0
         }
       }
     },
     "11680": {
-      "count": 399,
+      "count": 405,
       "months": {
         "202608": {
           "raw": 100,
@@ -667,21 +667,21 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 156,
-          "included": 152,
+          "raw": 158,
+          "included": 154,
           "canceled": 4,
           "nonSale": 0
         },
         "202611": {
-          "raw": 30,
-          "included": 28,
+          "raw": 34,
+          "included": 32,
           "canceled": 2,
           "nonSale": 0
         }
       }
     },
     "11710": {
-      "count": 732,
+      "count": 770,
       "months": {
         "202608": {
           "raw": 177,
@@ -696,25 +696,25 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 211,
-          "included": 209,
-          "canceled": 2,
+          "raw": 231,
+          "included": 228,
+          "canceled": 3,
           "nonSale": 0
         },
         "202611": {
-          "raw": 26,
-          "included": 26,
-          "canceled": 0,
+          "raw": 46,
+          "included": 45,
+          "canceled": 1,
           "nonSale": 0
         }
       }
     },
     "11740": {
-      "count": 566,
+      "count": 574,
       "months": {
         "202608": {
-          "raw": 205,
-          "included": 185,
+          "raw": 206,
+          "included": 186,
           "canceled": 20,
           "nonSale": 0
         },
@@ -725,15 +725,15 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 187,
-          "included": 185,
+          "raw": 190,
+          "included": 188,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 48,
-          "included": 47,
-          "canceled": 1,
+          "raw": 53,
+          "included": 51,
+          "canceled": 2,
           "nonSale": 0
         }
       }
