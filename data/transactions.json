@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "state": "ok",
-  "lastAttemptAt": "2026-11-21T02:12:29.680Z",
-  "updatedAt": "2026-11-21T02:12:29.680Z",
-  "revision": "20261121T021229680Z",
+  "lastAttemptAt": "2026-11-22T01:16:35.976Z",
+  "updatedAt": "2026-11-22T01:16:35.976Z",
+  "revision": "20261122T011635976Z",
   "source": "국토교통부 아파트 매매 실거래가 상세 자료",
   "sourceUrl": "https://www.data.go.kr/data/15126468/openapi.do",
   "months": [
@@ -217,7 +217,7 @@
       }
     },
     "11290": {
-      "count": 607,
+      "count": 606,
       "months": {
         "202608": {
           "raw": 181,
@@ -226,8 +226,8 @@
           "nonSale": 0
         },
         "202609": {
-          "raw": 184,
-          "included": 178,
+          "raw": 183,
+          "included": 177,
           "canceled": 6,
           "nonSale": 0
         },
@@ -304,7 +304,7 @@
       }
     },
     "11350": {
-      "count": 1542,
+      "count": 1541,
       "months": {
         "202608": {
           "raw": 548,
@@ -320,8 +320,8 @@
         },
         "202610": {
           "raw": 481,
-          "included": 475,
-          "canceled": 6,
+          "included": 474,
+          "canceled": 7,
           "nonSale": 0
         },
         "202611": {
@@ -449,7 +449,7 @@
       }
     },
     "11500": {
-      "count": 877,
+      "count": 876,
       "months": {
         "202608": {
           "raw": 273,
@@ -464,8 +464,8 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 276,
-          "included": 263,
+          "raw": 275,
+          "included": 262,
           "canceled": 13,
           "nonSale": 0
         },
@@ -536,7 +536,7 @@
       }
     },
     "11560": {
-      "count": 458,
+      "count": 460,
       "months": {
         "202608": {
           "raw": 151,
@@ -557,8 +557,8 @@
           "nonSale": 0
         },
         "202611": {
-          "raw": 46,
-          "included": 45,
+          "raw": 48,
+          "included": 47,
           "canceled": 1,
           "nonSale": 0
         }
@@ -594,7 +594,7 @@
       }
     },
     "11620": {
-      "count": 446,
+      "count": 445,
       "months": {
         "202608": {
           "raw": 122,
@@ -609,8 +609,8 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 173,
-          "included": 162,
+          "raw": 172,
+          "included": 161,
           "canceled": 11,
           "nonSale": 0
         },
