@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "state": "ok",
-  "lastAttemptAt": "2026-11-22T01:16:35.976Z",
-  "updatedAt": "2026-11-22T01:16:35.976Z",
-  "revision": "20261122T011635976Z",
+  "lastAttemptAt": "2026-11-23T01:41:29.917Z",
+  "updatedAt": "2026-11-23T01:41:29.917Z",
+  "revision": "20261123T014129917Z",
   "source": "국토교통부 아파트 매매 실거래가 상세 자료",
   "sourceUrl": "https://www.data.go.kr/data/15126468/openapi.do",
   "months": [
@@ -464,9 +464,9 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 275,
+          "raw": 274,
           "included": 262,
-          "canceled": 13,
+          "canceled": 12,
           "nonSale": 0
         },
         "202611": {
@@ -536,7 +536,7 @@
       }
     },
     "11560": {
-      "count": 460,
+      "count": 463,
       "months": {
         "202608": {
           "raw": 151,
@@ -551,14 +551,14 @@
           "nonSale": 0
         },
         "202610": {
-          "raw": 146,
-          "included": 144,
+          "raw": 147,
+          "included": 145,
           "canceled": 2,
           "nonSale": 0
         },
         "202611": {
-          "raw": 48,
-          "included": 47,
+          "raw": 50,
+          "included": 49,
           "canceled": 1,
           "nonSale": 0
         }
@@ -681,7 +681,7 @@
       }
     },
     "11710": {
-      "count": 787,
+      "count": 788,
       "months": {
         "202608": {
           "raw": 177,
@@ -702,8 +702,8 @@
           "nonSale": 0
         },
         "202611": {
-          "raw": 60,
-          "included": 59,
+          "raw": 61,
+          "included": 60,
           "canceled": 1,
           "nonSale": 0
         }
